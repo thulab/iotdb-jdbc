@@ -17,4 +17,7 @@ before_install:
 #  - sudo make install
 #  - cd ..
 
-script: mvn clean test
+script: 
+# only SNAPSHOT version needs to do the following phase
+  - https://github.com/thulab/tsfile.git && cd tsfile && git checkout hxd_tsfile_sdk  && mvn install -DskipTests=true
+  - mvn clean test
