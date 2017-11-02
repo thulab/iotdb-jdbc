@@ -17,10 +17,10 @@ before_install:
 #  - sudo make install
 #  - cd ..
 
-  - git clone https://github.com/thulab/tsfile.git
-  - cd tsfile 
-  - git checkout hxd_tsfile_sdk
-  - mvn install -DskipTests=true
+#  - git clone https://github.com/thulab/tsfile.git
+#  - cd tsfile 
+#  - git checkout hxd_tsfile_sdk
+#  - mvn install -DskipTests=true
 
 script: 
 # only SNAPSHOT version needs to do the following phase
