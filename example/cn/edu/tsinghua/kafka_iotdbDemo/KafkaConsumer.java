@@ -96,6 +96,7 @@ class KMXConsumerThread implements Runnable {
 
 	private KafkaStream<String, String> stream;
 	private SendDataToIotdb sendDataToIotdb;
+	private static Logger logger = LoggerFactory.getLogger(KMXConsumerThread.class);
 
 	public KMXConsumerThread(KafkaStream<String, String> stream) throws Exception {
 		this.stream = stream;

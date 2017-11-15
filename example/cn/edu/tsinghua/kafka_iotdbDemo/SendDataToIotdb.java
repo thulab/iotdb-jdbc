@@ -54,7 +54,8 @@ public class SendDataToIotdb {
 			try{
 				epl = "SET STORAGE GROUP TO " + model.deltaObj;
 				statement.execute(epl);
-			} finally {
+			} catch (Exception e) {
+
 			}
 			epl = "CREATE TIMESERIES " + path + " WITH DATATYPE=TEXT, ENCODING=PLAIN";
 			statement.execute(epl);
