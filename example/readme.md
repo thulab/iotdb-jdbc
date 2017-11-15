@@ -1,6 +1,6 @@
 # Function
 ```
-The example is to show how to send data from localhost to IoTDB through Kafka.
+The example is to show how to send data from hydra to IoTDB through Kafka.
 ```
 # Usage
 ## Dependencies with Maven
@@ -25,19 +25,23 @@ The example is to show how to send data from localhost to IoTDB through Kafka.
 ```
   Before you run the program, make sure you have launched the servers of Kafka and IoTDB.
   For details, please refer to http://kafka.apache.org/081/documentation.html#quickstart
+  If you are using windows, you may refer to http://blog.csdn.net/evankaka/article/details/52421314 
+  and http://blog.csdn.net/yuebao1991/article/details/72771599 
+  when you come across some issues.
 ```
 
-## Run KafkaProducer.java
+## Run hydra
+### modify configuration
+Please make sure you have `conf\config.properties` under hydra's root directory if you are using intelliJ. For eclipse and other IDE users, figure out where to put this file yourself.  
+Then open `conf\config.properties`,   
+set `qa81.kafkaUrl=127.0.0.1:9092` to your Kafka url,   
+and set `KMXRecordType=json` as given.
 
-```
-  The program is to send data from localhost to Kafka clusters.
-  Firstly, you have to change the parameter of TOPIC to what you create：(for example : "test")
-  > public final static String TOPIC = "test";
-  The default format of data is "device,timestamp,value ". (for example : "sensor1,2017/10/24 19:30:00,60")
-  Then you need to create a .CSV file in your localhost, which contains the data to be transmitted.Then set the parameter of Filename：(for example : "c:\\data.csv")
-  > private final static String fileName = "c:\\data.csv";
-  Finally, run KafkaProducer.java
-```
+### run RealTimeDataTool.java
+You may find this java file in   
+`hydra\hydra-k2platform-parent\hydra-k2platform-tools-parent\hydra-k2platform-qatools\src\main\java\com\k2data\e2e\tool\RealTimeDataTool.java`  
+Run it with option "sdo", so that the generated data will be put onto Kafka.
+
 
 ## Run KafkaConsumer.java
 
@@ -47,15 +51,3 @@ The example is to show how to send data from localhost to IoTDB through Kafka.
   > private final static int threadsNum = 5;
 ```
 
-### Notice 
-  If you want to use multiple consumers, please make sure that the number of topic's partition you create is more than 1.
-
-## Run SendDataToIotdb.java
-
-```
-  The program is to upload data to IoTDB.
-  You can set the parameter of threadsNum to make sure the number of consumer threads:(for example: "5")
-  > private final static int threadsNum = 5;
-  Then you change the insert EQL according to your localhost's data.
-  Finally, run SendDataToIotdb.java
-```
