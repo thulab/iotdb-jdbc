@@ -56,13 +56,13 @@ public class SendDataToIotdb {
 		boolean hasResultSet = statement.execute(sql);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 		if (hasResultSet) {
-		    ResultSet res = statement.getResultSet();
-		    System.out.println("                    Time"+"|"+path);
-		    while (res.next()) {
-			long time=Long.parseLong(res.getString("Time"));
-			String dateTime=dateFormat.format(new Date(time));
-			System.out.println(dateTime + " | " + res.getString(path));
-		    }
+			ResultSet res = statement.getResultSet();
+			System.out.println("                    Time"+"|"+path);
+			while (res.next()) {
+				long time=Long.parseLong(res.getString("Time"));
+				String dateTime=dateFormat.format(new Date(time));
+				System.out.println(dateTime + " | " + res.getString(path));
+			}
 		}
 	}
 
