@@ -21,46 +21,45 @@ public class SendDataToIotdb {
 		Class.forName("cn.edu.tsinghua.iotdb.jdbc.TsfileDriver");
 		// 2. DriverManager connect to IoTDB
 		connection = DriverManager.getConnection("jdbc:tsfile://localhost:6667/", "root", "root");
-	
+
 		statement = connection.createStatement();
 	}
 
-	public void writeData(String out) throws Exception {   //write data to IoTDB
+	public void writeData(String out) throws Exception { // write data to IoTDB
 
 		String item[] = out.split(",");
-		
+
 		// get table structure information from IoTDB-JDBC
 		DatabaseMetaData databaseMetaData = connection.getMetaData();
-	    
-		//String path is the path to insert
+
+		// String path is the path to insert
 		String path = "root.vehicle.sensor." + item[0];
-		
-		//get path set iterator
+
+		// get path set iterator
 		resultSet = databaseMetaData.getColumns(null, null, path, null);
-		
-		//if path set iterator is null，then create path
-		if(!resultSet.next())
-		{
+
+		// if path set iterator is null，then create path
+		if (!resultSet.next()) {
 			String epl = "CREATE TIMESERIES " + path + " WITH DATATYPE=TEXT, ENCODING=PLAIN";
 			statement.execute(epl);
 		}
-		//insert data to IoTDB
+		// insert data to IoTDB
 		String template = "INSERT INTO root.vehicle.sensor(timestamp,%s) VALUES (%s,'%s')";
 		String epl = String.format(template, item[0], item[1], item[2]);
 		statement.execute(epl);
-		}
-	
-	public void readData(String path) throws Exception {       //read data from IoTDB
+	}
 
-		String sql="select * from root.vehicle";
+	public void readData(String path) throws Exception { // read data from IoTDB
+
+		String sql = "select * from root.vehicle";
 		boolean hasResultSet = statement.execute(sql);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 		if (hasResultSet) {
 			ResultSet res = statement.getResultSet();
-			System.out.println("                    Time"+"|"+path);
+			System.out.println("                    Time" + "|" + path);
 			while (res.next()) {
-				long time=Long.parseLong(res.getString("Time"));
-				String dateTime=dateFormat.format(new Date(time));
+				long time = Long.parseLong(res.getString("Time"));
+				String dateTime = dateFormat.format(new Date(time));
 				System.out.println(dateTime + " | " + res.getString(path));
 			}
 		}
@@ -76,4 +75,3 @@ public class SendDataToIotdb {
 		sendDataToIotdb.readData("root.vehicle.sensor.sensor4");
 	}
 }
-
