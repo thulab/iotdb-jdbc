@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "Package tsfile..."
+echo "Package iotdb-jdbc..."
 mvn clean package -Dmaven.test.skip=true
 
 if [ -d "./lib/" ]; then
