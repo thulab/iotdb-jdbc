@@ -178,7 +178,7 @@ public class TsFilePrepareStatementTest {
 		ps.execute();
 		ArgumentCaptor<TSExecuteStatementReq> argument = ArgumentCaptor.forClass(TSExecuteStatementReq.class);
 		verify(client).executeStatement(argument.capture());
-		assertEquals("SELECT status, temperature FROM root.ln.wf01.wt01 WHERE time > 2017-11-01T00:13:00.000+08:00", argument.getValue().getStatement());
+		assertEquals("SELECT status, temperature FROM root.ln.wf01.wt01 WHERE time > 2017-11-01 00:13:00.000", argument.getValue().getStatement());
 	}
 	
 	@SuppressWarnings("resource")
@@ -245,6 +245,6 @@ public class TsFilePrepareStatementTest {
 		
 		ArgumentCaptor<TSExecuteStatementReq> argument = ArgumentCaptor.forClass(TSExecuteStatementReq.class);
 		verify(client).executeStatement(argument.capture());
-		assertEquals("INSERT INTO root.ln.wf01.wt01(timestamp,a,b,c,d,e,f) VALUES(2017-11-01T00:13:00.000+08:00,false,123,123234345,123.423,-1323.0,'abc')", argument.getValue().getStatement());
+		assertEquals("INSERT INTO root.ln.wf01.wt01(timestamp,a,b,c,d,e,f) VALUES(2017-11-01 00:13:00.000,false,123,123234345,123.423,-1323.0,'abc')", argument.getValue().getStatement());
 	}
 }

@@ -318,7 +318,7 @@ public class TsfilePrepareStatement extends TsfileStatement implements PreparedS
 	@Override
 	public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException {
 		DateTime dt = new DateTime(x.getTime());
-		this.parameters.put(parameterIndex, dt.toString());
+		this.parameters.put(parameterIndex, dt.toString("yyyy-MM-dd HH:mm:ss.SSS"));
 	}
 
 	@Override

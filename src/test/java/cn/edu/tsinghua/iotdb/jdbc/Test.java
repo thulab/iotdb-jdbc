@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 public class Test {
 
@@ -69,6 +70,14 @@ public class Test {
 			preparedStatement.setFloat(3, 20.092794f);
 			preparedStatement.execute();
 			preparedStatement.clearParameters();
+			
+			
+			preparedStatement.setTimestamp(1, Timestamp.valueOf("2017-11-01 00:03:00"));
+			preparedStatement.setBoolean(2, false);
+			preparedStatement.setFloat(3, 20.092794f);
+			preparedStatement.execute();
+			preparedStatement.clearParameters();
+						
 			preparedStatement.close();
 			
 			ResultSet resultSet = preparedStatement.executeQuery("select * from root");
