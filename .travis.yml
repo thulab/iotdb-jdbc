@@ -28,4 +28,4 @@ script:
   - mvn clean test
   
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -t 6e84c5bb-80fa-4b8f-8230-fe514093048a
+  - bash <(curl -s https://codecov.io/bash)
