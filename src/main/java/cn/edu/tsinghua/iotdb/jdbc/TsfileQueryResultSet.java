@@ -626,7 +626,7 @@ public class TsfileQueryResultSet implements ResultSet {
 				if (!resp.hasResultSet) {
 					emptyResultSet = true;
 				} else {
-					QueryDataSet queryDataSet = Utils.convertQueryDataSet(resp.getQueryDataSet());
+					QueryDataSet queryDataSet = Utils.convertQueryDataSet(operationType, resp.getQueryDataSet());
 					List<RowRecord> records = new ArrayList<>();
 					while (queryDataSet.hasNextRecord()) {
 						RowRecord rowRecord = queryDataSet.getNextRecord();

@@ -12,6 +12,7 @@ import cn.edu.tsinghua.tsfile.file.metadata.enums.TSEncoding;
 import cn.edu.tsinghua.tsfile.timeseries.read.query.DynamicOneColumnData;
 import cn.edu.tsinghua.tsfile.timeseries.read.query.QueryDataSet;
 
+import cn.edu.tsinghua.tsfile.timeseries.read.query.SegmentQueryDataSet;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -92,11 +93,18 @@ public class Utils {
         return ColumnSchema;
     }
 
-    public static QueryDataSet convertQueryDataSet(TSQueryDataSet tsQueryDataSet) {
-        QueryDataSet queryDataSet = new QueryDataSet();
+    public static QueryDataSet convertQueryDataSet(String operationType, TSQueryDataSet tsQueryDataSet) {
+        QueryDataSet queryDataSet = null;
+        if (operationType.equals("SEGMENTBY")) {
+            queryDataSet = new SegmentQueryDataSet();
+        } else {
+            queryDataSet = new QueryDataSet();
+        }
+
         List<String> keys = tsQueryDataSet.getKeys();
         List<TSDynamicOneColumnData> values = tsQueryDataSet.getValues();
 
+        //tsQueryDataSet.
         LinkedHashMap<String, DynamicOneColumnData> ret = new LinkedHashMap<>();
         int length = keys.size();
         for (int i = 0; i < length; i++) {
