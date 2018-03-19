@@ -32,12 +32,7 @@ import java.sql.SQLXML;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TsfileQueryResultSet implements ResultSet {
 
@@ -60,6 +55,13 @@ public class TsfileQueryResultSet implements ResultSet {
 	private String operationType;
 	private final String TIMESTAMP_STR = "Time";
 
+    private int rowsCount = 0;
+	private int rowsOffset=-1;
+	private int rowsLimit=-1;
+
+	private int seriesOffset=-1;
+	private int seriesLimit=-1;
+
 	public TsfileQueryResultSet() {
 
 	}
@@ -68,26 +70,64 @@ public class TsfileQueryResultSet implements ResultSet {
 								TS_SessionHandle sessionHandle, TSOperationHandle operationHandle, String sql,
 								String aggregations, List<String> columnTypeList)
 			throws SQLException {
+
+        // try to retrieve limit&offset&slimit&soffset parameters from sql
+        String[] splited = sql.toUpperCase().split("\\s+");
+        int posLimit = Arrays.asList(splited).indexOf("LIMIT");
+        if(posLimit !=-1) {
+            rowsLimit = Integer.parseInt(splited[posLimit+1]);
+            int posOffset = Arrays.asList(splited).indexOf("OFFSET");
+            if(posOffset!=-1) {
+                rowsOffset = Integer.parseInt(splited[posOffset+1]);
+            }
+        }
+        int posSLimit = Arrays.asList(splited).indexOf("SLIMIT");
+        if(posSLimit !=-1) {
+            seriesLimit = Integer.parseInt(splited[posSLimit+1]);
+            int posSOffset = Arrays.asList(splited).indexOf("SOFFSET");
+            if(posSOffset!=-1) {
+                seriesOffset = Integer.parseInt(splited[posSOffset+1]);
+            }
+        }
+
+        this.sql = sql;
 		this.statement = statement;
-		this.sql = sql;
-		this.columnInfoList = new ArrayList<>();
-		this.columnInfoMap = new HashMap<>();
-		this.client = client;
-		this.operationHandle = operationHandle;
+        this.maxRows = statement.getMaxRows();
+        this.fetchSize = statement.getFetchSize();
+        this.client = client;
+        this.operationHandle = operationHandle;
+        this.operationType = aggregations;
+        this.columnInfoList = new ArrayList<>();
+        this.columnInfoMap = new HashMap<>();
+        this.columnTypeList = new ArrayList<>();
+
 		this.columnInfoList.add(TIMESTAMP_STR);
 		this.columnInfoMap.put(TIMESTAMP_STR, 1);
 		int index = 2;
-		for (String name : columnName) {
+		int colCount = columnName.size();
+		if(seriesLimit == -1) { // if slimit is unset
+			seriesLimit = colCount;
+			seriesOffset=0;
+		}
+		else {
+			if(seriesOffset==-1) { // if slimit is set and soffset is unset
+				seriesOffset= 0;
+			}
+			else if(seriesOffset >= colCount) { // if slimit is set while soffset exceeds the upper boundary
+                seriesLimit = 0;
+                // assign 0 to seriesLimit so next() will return 'false' instantly and the 'FOR' loop below will be skipped.
+            }
+		}
+		int tmpEnd = seriesOffset+seriesLimit;
+		for(int i=seriesOffset; i<colCount && i<tmpEnd; i++){
+			String name = columnName.get(i);
 			columnInfoList.add(name);
 			if(!columnInfoMap.containsKey(name)){
 				columnInfoMap.put(name, index++);
 			}
+			this.columnTypeList.add(columnTypeList.get(i));
 		}
-		this.maxRows = statement.getMaxRows();
-		this.fetchSize = statement.getFetchSize();
-		this.operationHandle = operationHandle;
-		this.operationType = aggregations;
-		this.columnTypeList = columnTypeList;
+
 	}
 
 	@Override
@@ -610,8 +650,7 @@ public class TsfileQueryResultSet implements ResultSet {
 		throw new SQLException("Method not supported");
 	}
 
-	@Override
-	public boolean next() throws SQLException {
+	public boolean nextWithoutLimit() throws SQLException{
 		if (maxRows > 0 && rowsFetched >= maxRows) {
 			System.out.println("Reach max rows " + maxRows);
 			return false;
@@ -619,7 +658,7 @@ public class TsfileQueryResultSet implements ResultSet {
 
 		if ((recordItr == null || !recordItr.hasNext()) && !emptyResultSet) {
 			TSFetchResultsReq req = new TSFetchResultsReq(sql, fetchSize);
-			
+
 			try {
 				TSFetchResultsResp resp = client.fetchResults(req);
 				Utils.verifySuccess(resp.status);
@@ -637,8 +676,8 @@ public class TsfileQueryResultSet implements ResultSet {
 			} catch (TException e) {
 				throw new SQLException("Cannot fetch result from server, because of network connection");
 			}
-		}
 
+		}
 		if (emptyResultSet) {
 			return false;
 		}
@@ -649,8 +688,42 @@ public class TsfileQueryResultSet implements ResultSet {
 		// columnInfo.remove(TIMESTAMP_STR);
 		// }
 		// }
-		rowsFetched++;
+		rowsFetched++;// note: rowsFetched is counted as long as a row is fetched no matter whether the row is within LIMIT or not
 		return true;
+	}
+
+	@Override
+	public boolean next() throws SQLException {
+		if(rowsLimit == 0 || seriesLimit == 0) {
+			return false;
+		}
+
+		if(rowsLimit!=-1 && rowsOffset!=-1)
+		{
+			for(int i=0;i<rowsOffset;i++) {
+				if(!nextWithoutLimit()){
+					return false;
+				}
+			}
+			rowsOffset = -1;
+		}
+
+		if(rowsLimit!=-1 && rowsCount >= rowsLimit){
+			System.out.println("Reach limit rows " + rowsLimit);
+			return false;
+		}
+
+		boolean isNextWithoutLimit = nextWithoutLimit();
+
+		if(!isNextWithoutLimit){
+			return false;
+		}
+		else {
+			if(rowsLimit!=-1) {
+				rowsCount++;
+			}
+			return true;
+		}
 	}
 
 	@Override
@@ -1119,7 +1192,7 @@ public class TsfileQueryResultSet implements ResultSet {
 			throw new SQLException("No record remains");
 		}
 	}
-	
+
 	private String findColumnNameByIndex(int columnIndex) throws SQLException{
 		if(columnIndex <= 0) {
 			throw new SQLException(String.format("column index should start from 1"));
@@ -1135,7 +1208,7 @@ public class TsfileQueryResultSet implements ResultSet {
 		if (columnName.equals(TIMESTAMP_STR)) {
 			return String.valueOf(record.getTime());
 		}
-		int tmp = columnInfoMap.get(columnName);
+		int tmp = columnInfoMap.get(columnName)+seriesOffset;
 		Field field = record.fields.get(tmp - 2);
 		if(field == null || field.getStringValue() == null) return null;
 		return field.getStringValue();
