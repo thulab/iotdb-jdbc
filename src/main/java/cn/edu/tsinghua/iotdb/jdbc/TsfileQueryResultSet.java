@@ -688,7 +688,7 @@ public class TsfileQueryResultSet implements ResultSet {
 		// columnInfo.remove(TIMESTAMP_STR);
 		// }
 		// }
-		rowsFetched++;// note: rowsFetched is counted as long as a row is fetched no matter whether the row is within LIMIT or not
+		rowsFetched++;//NOTE: rowsFetched is counted as long as a row is fetched no matter whether the row is within LIMIT or not
 		return true;
 	}
 
@@ -709,7 +709,6 @@ public class TsfileQueryResultSet implements ResultSet {
 		}
 
 		if(rowsLimit!=-1 && rowsCount >= rowsLimit){
-			System.out.println("Reach limit rows " + rowsLimit);
 			return false;
 		}
 
