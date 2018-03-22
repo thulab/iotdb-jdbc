@@ -54,17 +54,17 @@ public class TsfileQueryResultSet implements ResultSet {
 	private boolean emptyResultSet = false;
 	private String operationType;
 	private final String TIMESTAMP_STR = "Time";
-	private final String LIMIT_STR="LIMIT";
-	private final String OFFSET_STR="OFFSET";
-	private final String SLIMIT_STR="SLIMIT";
-	private final String SOFFSET_STR="SOFFSET";
+    private final String LIMIT_STR = "LIMIT";
+    private final String OFFSET_STR = "OFFSET";
+    private final String SLIMIT_STR = "SLIMIT";
+    private final String SOFFSET_STR = "SOFFSET";
 
     private int rowsCount = 0;
-	private int rowsOffset=-1;
-	private int rowsLimit=-1;
+    private int rowsOffset = -1;
+    private int rowsLimit = -1;
 
-	private int seriesOffset=-1;
-	private int seriesLimit=-1;
+    private int seriesOffset = -1;
+    private int seriesLimit = -1;
 
 	public TsfileQueryResultSet() {
 
