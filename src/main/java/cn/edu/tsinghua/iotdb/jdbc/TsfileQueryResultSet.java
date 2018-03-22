@@ -77,20 +77,21 @@ public class TsfileQueryResultSet implements ResultSet {
 
         // first try to retrieve limit&offset&slimit&soffset parameters from sql
         String[] splited = sql.toUpperCase().split("\\s+");
-        int posLimit = Arrays.asList(splited).indexOf(LIMIT_STR);
-        if(posLimit !=-1) {
-            rowsLimit = Integer.parseInt(splited[posLimit+1]);
-            int posOffset = Arrays.asList(splited).indexOf(OFFSET_STR);
-            if(posOffset!=-1) {
-                rowsOffset = Integer.parseInt(splited[posOffset+1]);
+        List arraySplited = Arrays.asList(splited);
+        int posLimit = arraySplited.indexOf(LIMIT_STR);
+        if (posLimit != -1) {
+            rowsLimit = Integer.parseInt(splited[posLimit + 1]);
+            int posOffset = arraySplited.indexOf(OFFSET_STR);
+            if (posOffset != -1) {
+                rowsOffset = Integer.parseInt(splited[posOffset + 1]);
             }
         }
-        int posSLimit = Arrays.asList(splited).indexOf(SLIMIT_STR);
-        if(posSLimit !=-1) {
-            seriesLimit = Integer.parseInt(splited[posSLimit+1]);
-            int posSOffset = Arrays.asList(splited).indexOf(SOFFSET_STR);
-            if(posSOffset!=-1) {
-                seriesOffset = Integer.parseInt(splited[posSOffset+1]);
+        int posSLimit = arraySplited.indexOf(SLIMIT_STR);
+        if (posSLimit != -1) {
+            seriesLimit = Integer.parseInt(splited[posSLimit + 1]);
+            int posSOffset = arraySplited.indexOf(SOFFSET_STR);
+            if (posSOffset != -1) {
+                seriesOffset = Integer.parseInt(splited[posSOffset + 1]);
             }
         }
 
@@ -110,34 +111,29 @@ public class TsfileQueryResultSet implements ResultSet {
 		int index = 2;
 		int colCount = columnName.size();
 
-		// modify seriesLimit & seriesOffset if they are unset or go beyond bound
-        // Note: rowLimit & rowOffset do not get modified because '-1' has special meanings to them in the next() function.
-		if(seriesLimit == -1) { // if slimit is unset
-			seriesLimit = colCount;
-			seriesOffset=0;
-		}
-		else { // slimit is set
-			if(seriesOffset==-1) { // if soffset is unset
-				seriesOffset= 0;
-			}
-			else if(seriesOffset >= colCount) { // if slimit is set but exceeds the upper boundary 'colCount'-1
-                seriesLimit = 0;
-                // assign 0 to seriesLimit so next() will return 'false' instantly without needing to fetch data
-                // and the 'FOR' loop below will be skipped because seriesOffset equals 'tmpEnd' then.
-            }
-            // else soffset is set and less than 'colCount', so there is no need to modify soffset.
-		}
+        if (seriesLimit == -1) { // if slimit is unset
+            seriesLimit = colCount;
+            seriesOffset = 0;
+        } else if (seriesOffset == -1) {// if slimit is set and soffset is unset
+            seriesOffset = 0;
+        } else if (seriesOffset >= colCount) { // if slimit and soffset are set, but soffset exceeds the upper boundary 'colCount'-1
+            // assign 0 to seriesLimit so next() will return 'false' instantly without needing to fetch data
+            // and the 'FOR' loop below will be skipped because seriesOffset equals 'seriesEnd' then.
+            seriesLimit = 0;
+        }
+        // else slimit and soffset are set and soffset is less than 'colCount',
+        // so there is no need to modify slimit or soffset.
 
-		// assign columnInfoList, columnInfoMap and columnTypeList
-		int tmpEnd = seriesOffset+seriesLimit;
-		for(int i=seriesOffset; i<colCount && i<tmpEnd; i++){
-			String name = columnName.get(i);
-			columnInfoList.add(name);
-			if(!columnInfoMap.containsKey(name)){
-				columnInfoMap.put(name, index++);
-			}
-			this.columnTypeList.add(columnTypeList.get(i));
-		}
+        // assign columnInfoList, columnInfoMap and columnTypeList
+        int tmpEnd = seriesOffset + seriesLimit;
+        for (int i = seriesOffset; i < colCount && i < tmpEnd; i++) {
+            String name = columnName.get(i);
+            columnInfoList.add(name);
+            if (!columnInfoMap.containsKey(name)) {
+                columnInfoMap.put(name, index++);
+            }
+            this.columnTypeList.add(columnTypeList.get(i));
+        }
 
 	}
 
@@ -702,8 +698,8 @@ public class TsfileQueryResultSet implements ResultSet {
 		// }
 
 		rowsFetched++;
-		// maxRows is a constraint that exists in parallel with the LIMIT&SLIMIT constraints,
-		// so rowsFetched will increase whenever the row is fetched,
+        // maxRows is a constraint that exists in parallel with the LIMIT&SLIMIT constraints,
+        // so rowsFetched will increase whenever the row is fetched,
         // regardless of whether the row satisfies the LIMIT&SLIMIT constraints or not.
 
 		return true;
@@ -712,12 +708,12 @@ public class TsfileQueryResultSet implements ResultSet {
 	@Override
     // the next record rule with the LIMIT&SLIMIT constraints added
 	public boolean next() throws SQLException {
-		if(rowsLimit == 0 || seriesLimit == 0) {
-			return false;// indicating immediately that there is no next record
-		}
+        if (rowsLimit == 0 || seriesLimit == 0) {
+            return false;// indicating immediately that there is no next record
+        }
 
-		if(rowsLimit!=-1){ // if LIMIT is set
-		    if(rowsOffset!=-1) { // if OFFSET is set and the initial offset move has not been done yet
+        if (rowsLimit != -1) { // if LIMIT is set
+            if (rowsOffset != -1) { // if OFFSET is set and the initial offset move has not been done yet
                 for (int i = 0; i < rowsOffset; i++) { // try to move to the the next record position where OFFSET indicates
                     if (!nextWithoutLimit()) {
                         return false;// cannot move to the next record position where OFFSET indicates
@@ -726,20 +722,19 @@ public class TsfileQueryResultSet implements ResultSet {
                 rowsOffset = -1; // indicating that the initial offset move has been finished
             }
 
-            if(rowsCount >= rowsLimit) { // if the LIMIT constraint is met
-		        return false;
+            if (rowsCount >= rowsLimit) { // if the LIMIT constraint is met
+                return false;
             }
-		}
+        }
 
-		if(!nextWithoutLimit()){
-			return false;
-		}
-		else {
-			if(rowsLimit!=-1) {
-				rowsCount++;
-			}
-			return true;
-		}
+        if (!nextWithoutLimit()) {
+            return false;
+        } else {
+            if (rowsLimit != -1) {
+                rowsCount++;
+            }
+            return true;
+        }
 	}
 
 	@Override
