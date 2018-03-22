@@ -96,7 +96,7 @@ public class TsfileQueryResultSet implements ResultSet {
         }
 
         this.sql = sql;
-		this.statement = statement;
+        this.statement = statement;
         this.maxRows = statement.getMaxRows();
         this.fetchSize = statement.getFetchSize();
         this.client = client;
@@ -106,10 +106,10 @@ public class TsfileQueryResultSet implements ResultSet {
         this.columnInfoMap = new HashMap<>();
         this.columnTypeList = new ArrayList<>();
 
-		this.columnInfoList.add(TIMESTAMP_STR);
-		this.columnInfoMap.put(TIMESTAMP_STR, 1);
-		int index = 2;
-		int colCount = columnName.size();
+        this.columnInfoList.add(TIMESTAMP_STR);
+        this.columnInfoMap.put(TIMESTAMP_STR, 1);
+        int index = 2;
+        int colCount = columnName.size();
 
         if (seriesLimit == -1) { // if slimit is unset
             seriesLimit = colCount;
