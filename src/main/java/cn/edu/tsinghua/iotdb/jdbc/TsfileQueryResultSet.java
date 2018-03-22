@@ -657,8 +657,8 @@ public class TsfileQueryResultSet implements ResultSet {
 		throw new SQLException("Method not supported");
 	}
 
-	// the next record rule without considering the LIMIT&SLIMIT constraints
-	public boolean nextWithoutLimit() throws SQLException{
+    // the next record rule without considering the LIMIT&SLIMIT constraints
+    private boolean nextWithoutLimit() throws SQLException {
 		if (maxRows > 0 && rowsFetched >= maxRows) {
 			System.out.println("Reach max rows " + maxRows);
 			return false;
