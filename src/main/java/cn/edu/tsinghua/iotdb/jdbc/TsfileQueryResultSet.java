@@ -78,21 +78,25 @@ public class TsfileQueryResultSet implements ResultSet {
         // first try to retrieve limit&offset&slimit&soffset parameters from sql
         String[] splited = sql.toUpperCase().split("\\s+");
         List arraySplited = Arrays.asList(splited);
-        int posLimit = arraySplited.indexOf(LIMIT_STR);
-        if (posLimit != -1) {
-            rowsLimit = Integer.parseInt(splited[posLimit + 1]);
-            int posOffset = arraySplited.indexOf(OFFSET_STR);
-            if (posOffset != -1) {
-                rowsOffset = Integer.parseInt(splited[posOffset + 1]);
+        try {
+            int posLimit = arraySplited.indexOf(LIMIT_STR);
+            if (posLimit != -1) {
+                rowsLimit = Integer.parseInt(splited[posLimit + 1]);
+                int posOffset = arraySplited.indexOf(OFFSET_STR);
+                if (posOffset != -1) {
+                    rowsOffset = Integer.parseInt(splited[posOffset + 1]);
+                }
             }
-        }
-        int posSLimit = arraySplited.indexOf(SLIMIT_STR);
-        if (posSLimit != -1) {
-            seriesLimit = Integer.parseInt(splited[posSLimit + 1]);
-            int posSOffset = arraySplited.indexOf(SOFFSET_STR);
-            if (posSOffset != -1) {
-                seriesOffset = Integer.parseInt(splited[posSOffset + 1]);
+            int posSLimit = arraySplited.indexOf(SLIMIT_STR);
+            if (posSLimit != -1) {
+                seriesLimit = Integer.parseInt(splited[posSLimit + 1]);
+                int posSOffset = arraySplited.indexOf(SOFFSET_STR);
+                if (posSOffset != -1) {
+                    seriesOffset = Integer.parseInt(splited[posSOffset + 1]);
+                }
             }
+        } catch (NumberFormatException e) {
+            throw new TsfileSQLException("out of range");
         }
 
         this.sql = sql;
