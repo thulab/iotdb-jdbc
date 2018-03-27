@@ -129,8 +129,8 @@ public class TsfileQueryResultSet implements ResultSet {
         // so there is no need to modify slimit or soffset.
 
         // assign columnInfoList, columnInfoMap and columnTypeList
-        int tmpEnd = seriesOffset + seriesLimit;
-        for (int i = seriesOffset; i < colCount && i < tmpEnd; i++) {
+        int seriesEnd = seriesOffset + seriesLimit;
+        for (int i = seriesOffset; i < colCount && i < seriesEnd; i++) {
             String name = columnName.get(i);
             columnInfoList.add(name);
             if (!columnInfoMap.containsKey(name)) {
@@ -731,15 +731,12 @@ public class TsfileQueryResultSet implements ResultSet {
             }
         }
 
-        if (!nextWithoutLimit()) {
-            return false;
-        } else {
-            if (rowsLimit != -1) {
-                rowsCount++;
-            }
-            return true;
-        }
-	}
+		boolean isNext = nextWithoutLimit();
+		if (isNext && rowsLimit != -1) {
+			rowsCount++;
+		}
+		return isNext;
+}
 
 	@Override
 	public boolean previous() throws SQLException {
