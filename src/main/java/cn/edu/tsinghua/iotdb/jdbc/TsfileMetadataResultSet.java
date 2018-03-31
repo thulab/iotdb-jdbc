@@ -14,10 +14,18 @@ import java.util.List;
 public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	private Iterator<?> columnItr;
-	private ColumnSchema currentColumn;
-	private String currentDeltaObject;
-	private List<String> currentTimeseries;
+
 	private MetadataType type;
+
+	private ColumnSchema currentColumn;
+
+	private String currentDeltaObject;
+
+	// for show timeseries result
+	private List<String> currentTimeseries; // current row for show timeseries
+	private static int colCount = 4; // the number of columns for show timeseries
+	private static String[] showTsLabels = new String[]{"Timeseries", "Storage Group", "DataType", "Encoding"}; // headers for show timeseries
+	private int[] maxValueLength; // the max length of the name of timeseries for show timeseries
 
 	public TsfileMetadataResultSet(List<ColumnSchema> columnSchemas, List<String> deltaObjectList) {
 		if (columnSchemas != null) {
@@ -29,10 +37,45 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 		}
 	}
 
-	public TsfileMetadataResultSet(List<List<String>> tslist){
+	// for show timeseries result
+	public TsfileMetadataResultSet(List<List<String>> tslist) {
 		type = MetadataType.SHOW_TIMESERIES;
 		columnItr = tslist.iterator();
+		/*
+		if (tslist.size() >= 1) {
+			colCount = tslist.get(0).size();
+		}
+		*/
+		maxValueLength = new int[colCount];
+		for (int i = 0; i < colCount; i++) {
+			int tmp = showTsLabels[i].length();
+			for (List<String> tsrow : tslist) {
+				int len = tsrow.get(i).length();
+				tmp = tmp > len ? tmp : len;
+			}
+			maxValueLength[i] = tmp;
+		}
 	}
+
+	// for show timeseries result
+	public int getMaxValueLength(int columnIndex) throws SQLException { // start from 1
+		if (type == MetadataType.SHOW_TIMESERIES && columnIndex >= 1 && columnIndex <= colCount) {
+			return maxValueLength[columnIndex-1];
+		} else {
+			throw new SQLException(String.format("select column index %d does not exists", columnIndex));
+		}
+	}
+
+	// for show timeseries result
+	public int getColCount() {
+		return colCount;
+	}
+
+	// for show timeseries result
+	public static String[] getShowTsLabels() {
+		return showTsLabels;
+	}
+
 
 	@Override
 	public void close() throws SQLException {
@@ -225,6 +268,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 				}
 				break;
 			case SHOW_TIMESERIES:
+				/*
 				if (columnIndex == 1) {
 					return getString("SHOW_TIMESERIES_NAME");
 				} else if (columnIndex == 2) {
@@ -233,6 +277,11 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 					return getString("SHOW_TIMESERIES_DATATYPE");
 				} else if (columnIndex == 4) {
 					return getString("SHOW_TIMESERIES_ENCODING");
+				}*/
+				for(int i = 1; i <= colCount; i++) {
+					if(columnIndex == i) {
+						return getString(showTsLabels[i-1]);
+					}
 				}
 				break;
 			default:
@@ -253,13 +302,13 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 				}
 			case "DELTA_OBJECT":
 				return currentDeltaObject;
-			case "SHOW_TIMESERIES_NAME":
+			case "Timeseries":
 				return currentTimeseries.get(0);
-			case "SHOW_TIMESERIES_STORAGE_GROUP":
+			case "Storage Group":
 				return currentTimeseries.get(1);
-			case "SHOW_TIMESERIES_DATATYPE":
+			case "DataType":
 				return currentTimeseries.get(2);
-			case "SHOW_TIMESERIES_ENCODING":
+			case "Encoding":
 				return currentTimeseries.get(3);
 			default:
 				break;
