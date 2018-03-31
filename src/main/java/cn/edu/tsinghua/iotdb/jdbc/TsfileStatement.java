@@ -36,7 +36,7 @@ public class TsfileStatement implements Statement {
 	private TS_SessionHandle sessionHandle = null;
 	private TSOperationHandle operationHandle = null;
 	private List<String> batchSQLList;
-
+	private static final String SHOW_TIMESERIES_COMMAND = "show timeseries";
 	/**
 	 * Keep state so we can fail certain calls made after close().
 	 */
@@ -171,18 +171,39 @@ public class TsfileStatement implements Statement {
 		}
 	}
 
+	/*
+		option 1: show timeseries sql -> return new TsfileMetadataResultSet
+		option 2: query sql -> return new TsfileQueryResultSet
+		option 3: update sql -> simply execute
+	 */
 	private boolean executeSQL(String sql) throws TException, SQLException {
 		isCancelled = false;
-		TSExecuteStatementReq execReq = new TSExecuteStatementReq(sessionHandle, sql);
-		TSExecuteStatementResp execResp = client.executeStatement(execReq);
-		operationHandle = execResp.getOperationHandle();
-		Utils.verifySuccess(execResp.getStatus());
-		if (execResp.getOperationHandle().hasResultSet) {
-			resultSet = new TsfileQueryResultSet(this, execResp.getColumns(), client, sessionHandle, 
-					operationHandle, sql, execResp.getOperationType(), getColumnsType(execResp.getColumns()));
-			return true;
+		String sqlToLowerCase = sql.toLowerCase().trim();
+		if(sqlToLowerCase.startsWith(SHOW_TIMESERIES_COMMAND) && !sqlToLowerCase.equals(SHOW_TIMESERIES_COMMAND)) {
+			String[] cmdSplited = sqlToLowerCase.split("\\s+");
+			if (cmdSplited.length < 3) {
+				throw new SQLException("Error format of \'SHOW TIMESERIES <PATH>\'");
+			} else if (cmdSplited.length > 3) {
+				throw new SQLException("Error format of \'SHOW TIMESERIES <PATH>\'");
+			} else {
+				String path = cmdSplited[2];
+				TsfileDatabaseMetadata databaseMetaData = (TsfileDatabaseMetadata) connection.getMetaData();
+				resultSet = databaseMetaData.getShowTimeseries(path);
+				return true;
+			}
 		}
-		return false;
+		else {
+			TSExecuteStatementReq execReq = new TSExecuteStatementReq(sessionHandle, sql);
+			TSExecuteStatementResp execResp = client.executeStatement(execReq);
+			operationHandle = execResp.getOperationHandle();
+			Utils.verifySuccess(execResp.getStatus());
+			if (execResp.getOperationHandle().hasResultSet) {
+				resultSet = new TsfileQueryResultSet(this, execResp.getColumns(), client, sessionHandle,
+						operationHandle, sql, execResp.getOperationType(), getColumnsType(execResp.getColumns()));
+				return true;
+			}
+			return false;
+		}
 	}
 
 	@Override

@@ -40,6 +40,7 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
   private static final org.apache.thrift.protocol.TField DELTA_OBJECT_MAP_FIELD_DESC = new org.apache.thrift.protocol.TField("deltaObjectMap", org.apache.thrift.protocol.TType.MAP, (short)3);
   private static final org.apache.thrift.protocol.TField DATA_TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("dataType", org.apache.thrift.protocol.TType.STRING, (short)4);
   private static final org.apache.thrift.protocol.TField ALL_COLUMNS_FIELD_DESC = new org.apache.thrift.protocol.TField("allColumns", org.apache.thrift.protocol.TType.LIST, (short)5);
+  private static final org.apache.thrift.protocol.TField SHOW_TIMESERIES_LIST_FIELD_DESC = new org.apache.thrift.protocol.TField("showTimeseriesList", org.apache.thrift.protocol.TType.LIST, (short)6);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -52,6 +53,7 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
   public Map<String,List<String>> deltaObjectMap; // optional
   public String dataType; // optional
   public List<String> allColumns; // optional
+  public List<List<String>> showTimeseriesList; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -59,7 +61,8 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     METADATA_IN_JSON((short)2, "metadataInJson"),
     DELTA_OBJECT_MAP((short)3, "deltaObjectMap"),
     DATA_TYPE((short)4, "dataType"),
-    ALL_COLUMNS((short)5, "allColumns");
+    ALL_COLUMNS((short)5, "allColumns"),
+    SHOW_TIMESERIES_LIST((short)6, "showTimeseriesList");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -84,6 +87,8 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
           return DATA_TYPE;
         case 5: // ALL_COLUMNS
           return ALL_COLUMNS;
+        case 6: // SHOW_TIMESERIES_LIST
+          return SHOW_TIMESERIES_LIST;
         default:
           return null;
       }
@@ -124,7 +129,7 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
   }
 
   // isset id assignments
-  private _Fields optionals[] = {_Fields.METADATA_IN_JSON,_Fields.DELTA_OBJECT_MAP,_Fields.DATA_TYPE,_Fields.ALL_COLUMNS};
+  private _Fields optionals[] = {_Fields.METADATA_IN_JSON,_Fields.DELTA_OBJECT_MAP,_Fields.DATA_TYPE,_Fields.ALL_COLUMNS,_Fields.SHOW_TIMESERIES_LIST};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -142,6 +147,10 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     tmpMap.put(_Fields.ALL_COLUMNS, new org.apache.thrift.meta_data.FieldMetaData("allColumns", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
+    tmpMap.put(_Fields.SHOW_TIMESERIES_LIST, new org.apache.thrift.meta_data.FieldMetaData("showTimeseriesList", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+            new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+                new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TSFetchMetadataResp.class, metaDataMap);
   }
@@ -188,6 +197,14 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       List<String> __this__allColumns = new ArrayList<String>(other.allColumns);
       this.allColumns = __this__allColumns;
     }
+    if (other.isSetShowTimeseriesList()) {
+      List<List<String>> __this__showTimeseriesList = new ArrayList<List<String>>(other.showTimeseriesList.size());
+      for (List<String> other_element : other.showTimeseriesList) {
+        List<String> __this__showTimeseriesList_copy = new ArrayList<String>(other_element);
+        __this__showTimeseriesList.add(__this__showTimeseriesList_copy);
+      }
+      this.showTimeseriesList = __this__showTimeseriesList;
+    }
   }
 
   public TSFetchMetadataResp deepCopy() {
@@ -201,6 +218,7 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     this.deltaObjectMap = null;
     this.dataType = null;
     this.allColumns = null;
+    this.showTimeseriesList = null;
   }
 
   public TS_Status getStatus() {
@@ -349,6 +367,45 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     }
   }
 
+  public int getShowTimeseriesListSize() {
+    return (this.showTimeseriesList == null) ? 0 : this.showTimeseriesList.size();
+  }
+
+  public java.util.Iterator<List<String>> getShowTimeseriesListIterator() {
+    return (this.showTimeseriesList == null) ? null : this.showTimeseriesList.iterator();
+  }
+
+  public void addToShowTimeseriesList(List<String> elem) {
+    if (this.showTimeseriesList == null) {
+      this.showTimeseriesList = new ArrayList<List<String>>();
+    }
+    this.showTimeseriesList.add(elem);
+  }
+
+  public List<List<String>> getShowTimeseriesList() {
+    return this.showTimeseriesList;
+  }
+
+  public TSFetchMetadataResp setShowTimeseriesList(List<List<String>> showTimeseriesList) {
+    this.showTimeseriesList = showTimeseriesList;
+    return this;
+  }
+
+  public void unsetShowTimeseriesList() {
+    this.showTimeseriesList = null;
+  }
+
+  /** Returns true if field showTimeseriesList is set (has been assigned a value) and false otherwise */
+  public boolean isSetShowTimeseriesList() {
+    return this.showTimeseriesList != null;
+  }
+
+  public void setShowTimeseriesListIsSet(boolean value) {
+    if (!value) {
+      this.showTimeseriesList = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case STATUS:
@@ -391,6 +448,14 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       }
       break;
 
+    case SHOW_TIMESERIES_LIST:
+      if (value == null) {
+        unsetShowTimeseriesList();
+      } else {
+        setShowTimeseriesList((List<List<String>>)value);
+      }
+      break;
+
     }
   }
 
@@ -410,6 +475,9 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
 
     case ALL_COLUMNS:
       return getAllColumns();
+
+    case SHOW_TIMESERIES_LIST:
+      return getShowTimeseriesList();
 
     }
     throw new IllegalStateException();
@@ -432,6 +500,8 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       return isSetDataType();
     case ALL_COLUMNS:
       return isSetAllColumns();
+    case SHOW_TIMESERIES_LIST:
+      return isSetShowTimeseriesList();
     }
     throw new IllegalStateException();
   }
@@ -491,6 +561,15 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       if (!(this_present_allColumns && that_present_allColumns))
         return false;
       if (!this.allColumns.equals(that.allColumns))
+        return false;
+    }
+
+    boolean this_present_showTimeseriesList = true && this.isSetShowTimeseriesList();
+    boolean that_present_showTimeseriesList = true && that.isSetShowTimeseriesList();
+    if (this_present_showTimeseriesList || that_present_showTimeseriesList) {
+      if (!(this_present_showTimeseriesList && that_present_showTimeseriesList))
+        return false;
+      if (!this.showTimeseriesList.equals(that.showTimeseriesList))
         return false;
     }
 
@@ -560,6 +639,16 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetShowTimeseriesList()).compareTo(other.isSetShowTimeseriesList());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetShowTimeseriesList()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.showTimeseriesList, other.showTimeseriesList);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -624,6 +713,16 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
         sb.append("null");
       } else {
         sb.append(this.allColumns);
+      }
+      first = false;
+    }
+    if (isSetShowTimeseriesList()) {
+      if (!first) sb.append(", ");
+      sb.append("showTimeseriesList:");
+      if (this.showTimeseriesList == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.showTimeseriesList);
       }
       first = false;
     }
@@ -696,25 +795,25 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
           case 3: // DELTA_OBJECT_MAP
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
-                org.apache.thrift.protocol.TMap _map124 = iprot.readMapBegin();
-                struct.deltaObjectMap = new HashMap<String,List<String>>(2*_map124.size);
-                for (int _i125 = 0; _i125 < _map124.size; ++_i125)
+                org.apache.thrift.protocol.TMap _map132 = iprot.readMapBegin();
+                struct.deltaObjectMap = new HashMap<String,List<String>>(2*_map132.size);
+                for (int _i133 = 0; _i133 < _map132.size; ++_i133)
                 {
-                  String _key126;
-                  List<String> _val127;
-                  _key126 = iprot.readString();
+                  String _key134;
+                  List<String> _val135;
+                  _key134 = iprot.readString();
                   {
-                    org.apache.thrift.protocol.TList _list128 = iprot.readListBegin();
-                    _val127 = new ArrayList<String>(_list128.size);
-                    for (int _i129 = 0; _i129 < _list128.size; ++_i129)
+                    org.apache.thrift.protocol.TList _list136 = iprot.readListBegin();
+                    _val135 = new ArrayList<String>(_list136.size);
+                    for (int _i137 = 0; _i137 < _list136.size; ++_i137)
                     {
-                      String _elem130;
-                      _elem130 = iprot.readString();
-                      _val127.add(_elem130);
+                      String _elem138;
+                      _elem138 = iprot.readString();
+                      _val135.add(_elem138);
                     }
                     iprot.readListEnd();
                   }
-                  struct.deltaObjectMap.put(_key126, _val127);
+                  struct.deltaObjectMap.put(_key134, _val135);
                 }
                 iprot.readMapEnd();
               }
@@ -734,17 +833,45 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
           case 5: // ALL_COLUMNS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list131 = iprot.readListBegin();
-                struct.allColumns = new ArrayList<String>(_list131.size);
-                for (int _i132 = 0; _i132 < _list131.size; ++_i132)
+                org.apache.thrift.protocol.TList _list139 = iprot.readListBegin();
+                struct.allColumns = new ArrayList<String>(_list139.size);
+                for (int _i140 = 0; _i140 < _list139.size; ++_i140)
                 {
-                  String _elem133;
-                  _elem133 = iprot.readString();
-                  struct.allColumns.add(_elem133);
+                  String _elem141;
+                  _elem141 = iprot.readString();
+                  struct.allColumns.add(_elem141);
                 }
                 iprot.readListEnd();
               }
               struct.setAllColumnsIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 6: // SHOW_TIMESERIES_LIST
+            if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+              {
+                org.apache.thrift.protocol.TList _list142 = iprot.readListBegin();
+                struct.showTimeseriesList = new ArrayList<List<String>>(_list142.size);
+                for (int _i143 = 0; _i143 < _list142.size; ++_i143)
+                {
+                  List<String> _elem144;
+                  {
+                    org.apache.thrift.protocol.TList _list145 = iprot.readListBegin();
+                    _elem144 = new ArrayList<String>(_list145.size);
+                    for (int _i146 = 0; _i146 < _list145.size; ++_i146)
+                    {
+                      String _elem147;
+                      _elem147 = iprot.readString();
+                      _elem144.add(_elem147);
+                    }
+                    iprot.readListEnd();
+                  }
+                  struct.showTimeseriesList.add(_elem144);
+                }
+                iprot.readListEnd();
+              }
+              struct.setShowTimeseriesListIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -781,14 +908,14 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
           oprot.writeFieldBegin(DELTA_OBJECT_MAP_FIELD_DESC);
           {
             oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, struct.deltaObjectMap.size()));
-            for (Map.Entry<String, List<String>> _iter134 : struct.deltaObjectMap.entrySet())
+            for (Map.Entry<String, List<String>> _iter148 : struct.deltaObjectMap.entrySet())
             {
-              oprot.writeString(_iter134.getKey());
+              oprot.writeString(_iter148.getKey());
               {
-                oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, _iter134.getValue().size()));
-                for (String _iter135 : _iter134.getValue())
+                oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, _iter148.getValue().size()));
+                for (String _iter149 : _iter148.getValue())
                 {
-                  oprot.writeString(_iter135);
+                  oprot.writeString(_iter149);
                 }
                 oprot.writeListEnd();
               }
@@ -810,9 +937,30 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
           oprot.writeFieldBegin(ALL_COLUMNS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.allColumns.size()));
-            for (String _iter136 : struct.allColumns)
+            for (String _iter150 : struct.allColumns)
             {
-              oprot.writeString(_iter136);
+              oprot.writeString(_iter150);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+      }
+      if (struct.showTimeseriesList != null) {
+        if (struct.isSetShowTimeseriesList()) {
+          oprot.writeFieldBegin(SHOW_TIMESERIES_LIST_FIELD_DESC);
+          {
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.LIST, struct.showTimeseriesList.size()));
+            for (List<String> _iter151 : struct.showTimeseriesList)
+            {
+              {
+                oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, _iter151.size()));
+                for (String _iter152 : _iter151)
+                {
+                  oprot.writeString(_iter152);
+                }
+                oprot.writeListEnd();
+              }
             }
             oprot.writeListEnd();
           }
@@ -850,21 +998,24 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       if (struct.isSetAllColumns()) {
         optionals.set(3);
       }
-      oprot.writeBitSet(optionals, 4);
+      if (struct.isSetShowTimeseriesList()) {
+        optionals.set(4);
+      }
+      oprot.writeBitSet(optionals, 5);
       if (struct.isSetMetadataInJson()) {
         oprot.writeString(struct.metadataInJson);
       }
       if (struct.isSetDeltaObjectMap()) {
         {
           oprot.writeI32(struct.deltaObjectMap.size());
-          for (Map.Entry<String, List<String>> _iter137 : struct.deltaObjectMap.entrySet())
+          for (Map.Entry<String, List<String>> _iter153 : struct.deltaObjectMap.entrySet())
           {
-            oprot.writeString(_iter137.getKey());
+            oprot.writeString(_iter153.getKey());
             {
-              oprot.writeI32(_iter137.getValue().size());
-              for (String _iter138 : _iter137.getValue())
+              oprot.writeI32(_iter153.getValue().size());
+              for (String _iter154 : _iter153.getValue())
               {
-                oprot.writeString(_iter138);
+                oprot.writeString(_iter154);
               }
             }
           }
@@ -876,9 +1027,24 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       if (struct.isSetAllColumns()) {
         {
           oprot.writeI32(struct.allColumns.size());
-          for (String _iter139 : struct.allColumns)
+          for (String _iter155 : struct.allColumns)
           {
-            oprot.writeString(_iter139);
+            oprot.writeString(_iter155);
+          }
+        }
+      }
+      if (struct.isSetShowTimeseriesList()) {
+        {
+          oprot.writeI32(struct.showTimeseriesList.size());
+          for (List<String> _iter156 : struct.showTimeseriesList)
+          {
+            {
+              oprot.writeI32(_iter156.size());
+              for (String _iter157 : _iter156)
+              {
+                oprot.writeString(_iter157);
+              }
+            }
           }
         }
       }
@@ -890,31 +1056,31 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       struct.status = new TS_Status();
       struct.status.read(iprot);
       struct.setStatusIsSet(true);
-      BitSet incoming = iprot.readBitSet(4);
+      BitSet incoming = iprot.readBitSet(5);
       if (incoming.get(0)) {
         struct.metadataInJson = iprot.readString();
         struct.setMetadataInJsonIsSet(true);
       }
       if (incoming.get(1)) {
         {
-          org.apache.thrift.protocol.TMap _map140 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, iprot.readI32());
-          struct.deltaObjectMap = new HashMap<String,List<String>>(2*_map140.size);
-          for (int _i141 = 0; _i141 < _map140.size; ++_i141)
+          org.apache.thrift.protocol.TMap _map158 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, iprot.readI32());
+          struct.deltaObjectMap = new HashMap<String,List<String>>(2*_map158.size);
+          for (int _i159 = 0; _i159 < _map158.size; ++_i159)
           {
-            String _key142;
-            List<String> _val143;
-            _key142 = iprot.readString();
+            String _key160;
+            List<String> _val161;
+            _key160 = iprot.readString();
             {
-              org.apache.thrift.protocol.TList _list144 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-              _val143 = new ArrayList<String>(_list144.size);
-              for (int _i145 = 0; _i145 < _list144.size; ++_i145)
+              org.apache.thrift.protocol.TList _list162 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+              _val161 = new ArrayList<String>(_list162.size);
+              for (int _i163 = 0; _i163 < _list162.size; ++_i163)
               {
-                String _elem146;
-                _elem146 = iprot.readString();
-                _val143.add(_elem146);
+                String _elem164;
+                _elem164 = iprot.readString();
+                _val161.add(_elem164);
               }
             }
-            struct.deltaObjectMap.put(_key142, _val143);
+            struct.deltaObjectMap.put(_key160, _val161);
           }
         }
         struct.setDeltaObjectMapIsSet(true);
@@ -925,16 +1091,38 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       }
       if (incoming.get(3)) {
         {
-          org.apache.thrift.protocol.TList _list147 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.allColumns = new ArrayList<String>(_list147.size);
-          for (int _i148 = 0; _i148 < _list147.size; ++_i148)
+          org.apache.thrift.protocol.TList _list165 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.allColumns = new ArrayList<String>(_list165.size);
+          for (int _i166 = 0; _i166 < _list165.size; ++_i166)
           {
-            String _elem149;
-            _elem149 = iprot.readString();
-            struct.allColumns.add(_elem149);
+            String _elem167;
+            _elem167 = iprot.readString();
+            struct.allColumns.add(_elem167);
           }
         }
         struct.setAllColumnsIsSet(true);
+      }
+      if (incoming.get(4)) {
+        {
+          org.apache.thrift.protocol.TList _list168 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.LIST, iprot.readI32());
+          struct.showTimeseriesList = new ArrayList<List<String>>(_list168.size);
+          for (int _i169 = 0; _i169 < _list168.size; ++_i169)
+          {
+            List<String> _elem170;
+            {
+              org.apache.thrift.protocol.TList _list171 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+              _elem170 = new ArrayList<String>(_list171.size);
+              for (int _i172 = 0; _i172 < _list171.size; ++_i172)
+              {
+                String _elem173;
+                _elem173 = iprot.readString();
+                _elem170.add(_elem173);
+              }
+            }
+            struct.showTimeseriesList.add(_elem170);
+          }
+        }
+        struct.setShowTimeseriesListIsSet(true);
       }
     }
   }

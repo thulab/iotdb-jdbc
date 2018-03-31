@@ -25,6 +25,48 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 	}
 
 	/**
+	 * the entrance of the call of client.fetchMetadata for cmd 'SHOW TIMESERIES PATH'
+	 * @param path a full or abstract path
+	 * @return TsfileMetadataResultSet
+	 */
+	public ResultSet getShowTimeseries(String path) throws SQLException {
+		try{
+			return getShowTimeseriesFunc(path);
+		} catch (TException e) {
+			boolean flag = connection.reconnect();
+			this.client = connection.client;
+			if (flag) {
+				try {
+					return getShowTimeseriesFunc(path);
+				} catch (TException e2) {
+					throw new SQLException(String.format(
+							"Fail to get the metadata of the queried timeseries %s"
+									+ " after reconnecting. please check server status", path));
+				}
+			} else {
+				throw new SQLException(String.format(
+						"Fail to reconnect to server when getting the metadata of the queried timeseries %s"
+								+ " after reconnecting. please check server status", path));
+			}
+		}
+	}
+
+	private ResultSet getShowTimeseriesFunc(String path) throws TException, SQLException {
+		TSFetchMetadataReq req = new TSFetchMetadataReq("SHOW_TIMESERIES");
+		req.setColumnPath(path);
+		TSFetchMetadataResp resp;
+		try {
+			resp = client.fetchMetadata(req);
+			Utils.verifySuccess(resp.getStatus());
+			List<List<String>> showTsMap = resp.getShowTimeseriesList();
+			return new TsfileMetadataResultSet(showTsMap);
+		} catch (TException e) {
+			throw new TException("Conncetion error when fetching timeseries metadata", e);
+		}
+	}
+
+
+	/**
 	 * if deltaObjectPattern != null, return all delta object
 	 * if deltaObjectPattern == null and columnPattern != null, return column schema， otherwise return null
 	 */

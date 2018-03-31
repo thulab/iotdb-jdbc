@@ -16,6 +16,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	private Iterator<?> columnItr;
 	private ColumnSchema currentColumn;
 	private String currentDeltaObject;
+	private List<String> currentTimeseries;
 	private MetadataType type;
 
 	public TsfileMetadataResultSet(List<ColumnSchema> columnSchemas, List<String> deltaObjectList) {
@@ -26,6 +27,11 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 			columnItr = deltaObjectList.iterator();
 			type = MetadataType.DELTA_OBJECT;
 		}
+	}
+
+	public TsfileMetadataResultSet(List<List<String>> tslist){
+		type = MetadataType.SHOW_TIMESERIES;
+		columnItr = tslist.iterator();
 	}
 
 	@Override
@@ -157,18 +163,23 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	public boolean next() throws SQLException {
 		boolean hasNext = columnItr.hasNext();
 		switch (type) {
-		case COLUMN:
-			if (hasNext) {
-				currentColumn = (ColumnSchema)columnItr.next();
-			}
-			return hasNext;			
-		case DELTA_OBJECT:
-			if (hasNext) {
-				currentDeltaObject = (String)columnItr.next();
-			}
-			return hasNext;		
-		default:
-			break;
+			case COLUMN:
+				if (hasNext) {
+					currentColumn = (ColumnSchema) columnItr.next();
+				}
+				return hasNext;
+			case DELTA_OBJECT:
+				if (hasNext) {
+					currentDeltaObject = (String) columnItr.next();
+				}
+				return hasNext;
+			case SHOW_TIMESERIES:
+				if (hasNext) {
+					currentTimeseries = (List<String>) columnItr.next();
+				}
+				return hasNext;
+			default:
+				break;
 		}
 		return false;
 	}
@@ -201,37 +212,57 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	@Override
 	public String getString(int columnIndex) throws SQLException {
 		switch (type) {
-		case DELTA_OBJECT:
-			if(columnIndex == 1){
-				return getString("DELTA_OBJECT");
-			}
-			break;
-		case COLUMN:
-			if(columnIndex == 1){
-				return getString("COLUMN_NAME");
-			} else if (columnIndex == 2) {
-				return getString("COLUMN_TYPE");
-			}
-		default:
-			break;
+			case DELTA_OBJECT:
+				if (columnIndex == 1) {
+					return getString("DELTA_OBJECT");
+				}
+				break;
+			case COLUMN:
+				if (columnIndex == 1) {
+					return getString("COLUMN_NAME");
+				} else if (columnIndex == 2) {
+					return getString("COLUMN_TYPE");
+				}
+				break;
+			case SHOW_TIMESERIES:
+				if (columnIndex == 1) {
+					return getString("SHOW_TIMESERIES_NAME");
+				} else if (columnIndex == 2) {
+					return getString("SHOW_TIMESERIES_STORAGE_GROUP");
+				} else if (columnIndex == 3) {
+					return getString("SHOW_TIMESERIES_DATATYPE");
+				} else if (columnIndex == 4) {
+					return getString("SHOW_TIMESERIES_ENCODING");
+				}
+				break;
+			default:
+				break;
 		}
 		throw new SQLException(String.format("select column index %d does not exists", columnIndex));
 	}
 
 	@Override
 	public String getString(String columnName) throws SQLException {
-	    	// use special key word to judge return content
+		// use special key word to judge return content
 		switch (columnName) {
-		case "COLUMN_NAME":
-			return currentColumn.name;
-		case "COLUMN_TYPE":
-			if(currentColumn.dataType != null) {
-				return currentColumn.dataType.toString();
-			}
-		case "DELTA_OBJECT":
-			return currentDeltaObject;
-		default:
-			break;
+			case "COLUMN_NAME":
+				return currentColumn.name;
+			case "COLUMN_TYPE":
+				if (currentColumn.dataType != null) {
+					return currentColumn.dataType.toString();
+				}
+			case "DELTA_OBJECT":
+				return currentDeltaObject;
+			case "SHOW_TIMESERIES_NAME":
+				return currentTimeseries.get(0);
+			case "SHOW_TIMESERIES_STORAGE_GROUP":
+				return currentTimeseries.get(1);
+			case "SHOW_TIMESERIES_DATATYPE":
+				return currentTimeseries.get(2);
+			case "SHOW_TIMESERIES_ENCODING":
+				return currentTimeseries.get(3);
+			default:
+				break;
 		}
 		return null;
 	}
@@ -267,6 +298,6 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	}
 
 	private enum MetadataType{
-		DELTA_OBJECT, COLUMN
+		DELTA_OBJECT, COLUMN, SHOW_TIMESERIES
 	}
 }
