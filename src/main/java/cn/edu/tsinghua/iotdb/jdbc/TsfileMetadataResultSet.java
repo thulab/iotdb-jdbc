@@ -199,7 +199,12 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	@Override
 	public ResultSetMetaData getMetaData() throws SQLException {
-		throw new SQLException("Method not supported");
+		if(type == MetadataType.SHOW_TIMESERIES) {
+			return new TsfileMetadataResultMetadata(showTsLabels);
+		}
+		else {
+			throw new SQLException("Method not supported");
+		}
 	}
 
 	@Override
@@ -268,16 +273,6 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 				}
 				break;
 			case SHOW_TIMESERIES:
-				/*
-				if (columnIndex == 1) {
-					return getString("SHOW_TIMESERIES_NAME");
-				} else if (columnIndex == 2) {
-					return getString("SHOW_TIMESERIES_STORAGE_GROUP");
-				} else if (columnIndex == 3) {
-					return getString("SHOW_TIMESERIES_DATATYPE");
-				} else if (columnIndex == 4) {
-					return getString("SHOW_TIMESERIES_ENCODING");
-				}*/
 				for(int i = 1; i <= colCount; i++) {
 					if(columnIndex == i) {
 						return getString(showTsLabels[i-1]);
