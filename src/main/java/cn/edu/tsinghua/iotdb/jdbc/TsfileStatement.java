@@ -37,6 +37,7 @@ public class TsfileStatement implements Statement {
 	private TSOperationHandle operationHandle = null;
 	private List<String> batchSQLList;
 	private static final String SHOW_TIMESERIES_COMMAND = "show timeseries";
+	private static final String SHOW_STORAGE_GROUP_COMMAND = "show storage group";
 	/**
 	 * Keep state so we can fail certain calls made after close().
 	 */
@@ -179,7 +180,7 @@ public class TsfileStatement implements Statement {
 	private boolean executeSQL(String sql) throws TException, SQLException {
 		isCancelled = false;
 		String sqlToLowerCase = sql.toLowerCase().trim();
-		if(sqlToLowerCase.startsWith(SHOW_TIMESERIES_COMMAND) && !sqlToLowerCase.equals(SHOW_TIMESERIES_COMMAND)) {
+		if (sqlToLowerCase.startsWith(SHOW_TIMESERIES_COMMAND) && !sqlToLowerCase.equals(SHOW_TIMESERIES_COMMAND)) {
 			String[] cmdSplited = sqlToLowerCase.split("\\s+");
 			if (cmdSplited.length < 3) {
 				throw new SQLException("Error format of \'SHOW TIMESERIES <PATH>\'");
@@ -191,8 +192,11 @@ public class TsfileStatement implements Statement {
 				resultSet = databaseMetaData.getShowTimeseries(path);
 				return true;
 			}
-		}
-		else {
+		} else if (sqlToLowerCase.equals(SHOW_STORAGE_GROUP_COMMAND)) {
+			TsfileDatabaseMetadata databaseMetaData = (TsfileDatabaseMetadata) connection.getMetaData();
+			resultSet = databaseMetaData.getColumns(null, null, null, "*");
+			return true;
+		} else {
 			TSExecuteStatementReq execReq = new TSExecuteStatementReq(sessionHandle, sql);
 			TSExecuteStatementResp execResp = client.executeStatement(execReq);
 			operationHandle = execResp.getOperationHandle();

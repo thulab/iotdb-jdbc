@@ -111,6 +111,21 @@ public class Test {
 			}
 			preparedStatement2.close();
 
+			PreparedStatement preparedStatement3 = connection.prepareStatement("show storage group");
+			boolean hasResultSet3 = preparedStatement3.execute();
+			if (hasResultSet3) {
+				ResultSet resultSet3 = preparedStatement3.getResultSet();
+				ResultSetMetaData resultSetMetaData3 = resultSet3.getMetaData();
+				while (resultSet3.next()) {
+					StringBuilder builder = new StringBuilder();
+					for (int i = 1; i <= resultSetMetaData3.getColumnCount(); i++) {
+						builder.append(resultSet3.getString(i)).append(",");
+					}
+					System.out.println(builder);
+				}
+			}
+			preparedStatement3.close();
+
 		} finally {
 			connection.close();
 		}

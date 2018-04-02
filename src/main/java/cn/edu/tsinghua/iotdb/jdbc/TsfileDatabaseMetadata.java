@@ -5,9 +5,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.apache.thrift.TException;
 
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSIService;
@@ -104,10 +103,22 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 				resp = client.fetchMetadata(req);
 				Utils.verifySuccess(resp.getStatus());
 				Map<String, List<String>> deltaObjectList = resp.getDeltaObjectMap();
-				if(deltaObjectList == null || !deltaObjectList.containsKey(deltaObjectPattern)){
-					new TsfileMetadataResultSet(null, new ArrayList<>());
+				if (deltaObjectPattern == "*") { // return all delta objects
+					if (deltaObjectList == null) {
+						return new TsfileMetadataResultSet(null, new ArrayList<>());
+					}
+					List<String> deltaObjects = new ArrayList<>();
+					Collection<List<String>> deltaObjectListValues = deltaObjectList.values();
+					for (List<String> value : deltaObjectListValues) {
+						deltaObjects.addAll(value);
+					}
+					return new TsfileMetadataResultSet(null, deltaObjects);
+				} else { // return specific delta objects
+					if (deltaObjectList == null || !deltaObjectList.containsKey(deltaObjectPattern)) {
+						return new TsfileMetadataResultSet(null, new ArrayList<>());
+					}
+					return new TsfileMetadataResultSet(null, deltaObjectList.get(deltaObjectPattern));
 				}
-				return new TsfileMetadataResultSet(null, deltaObjectList.get(deltaObjectPattern));
 			} catch (TException e) {
 				throw new TException("Conncetion error when fetching delta object metadata", e);
 			}

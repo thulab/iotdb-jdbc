@@ -5,8 +5,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 /*
-   This class is mainly used for show timeseries results(TsfileMetadataResultSet)
-   to be retrieved in a similar way to TsfileQueryResultSet, for example:
+   This class is mainly used for TsfileMetadataResultSet to be used in a similar way to TsfileQueryResultSet, for example:
 
    boolean hasResultSet = statement.execute("show timeseries root.ln.wf01.wt01");
    if(hasResultSet) {
@@ -24,10 +23,12 @@ import java.sql.Types;
 
    */
 public class TsfileMetadataResultMetadata implements ResultSetMetaData {
-    private String[] showTsLabels;
-    public TsfileMetadataResultMetadata(String[] showTsLabels) {
-        this.showTsLabels = showTsLabels;
+    private String[] showLabels;
+
+    public TsfileMetadataResultMetadata(String[] showLabels) {
+        this.showLabels = showLabels;
     }
+
     @Override
     public boolean isWrapperFor(Class<?> arg0) throws SQLException {
         // TODO Auto-generated method stub
@@ -54,10 +55,10 @@ public class TsfileMetadataResultMetadata implements ResultSetMetaData {
 
     @Override
     public int getColumnCount() throws SQLException {
-        if (showTsLabels == null || showTsLabels.length == 0) {
+        if (showLabels == null || showLabels.length == 0) {
             throw new SQLException("No column exists");
         }
-        return showTsLabels.length;
+        return showLabels.length;
     }
 
     @Override
@@ -68,16 +69,16 @@ public class TsfileMetadataResultMetadata implements ResultSetMetaData {
 
     @Override
     public String getColumnLabel(int column) throws SQLException {
-        if (showTsLabels == null || showTsLabels.length == 0) {
+        if (showLabels == null || showLabels.length == 0) {
             throw new SQLException("No column exists");
         }
-        if(column > showTsLabels.length){
+        if (column > showLabels.length) {
             throw new SQLException(String.format("column %d does not exist", column));
         }
-        if(column <= 0) {
-            throw new SQLException(String.format("column index should start from 1", column));
+        if (column <= 0) {
+            throw new SQLException("column index should start from 1");
         }
-        return showTsLabels[column-1];
+        return showLabels[column - 1];
     }
 
     @Override
@@ -88,10 +89,10 @@ public class TsfileMetadataResultMetadata implements ResultSetMetaData {
     @Override
     public int getColumnType(int column) throws SQLException {
         // TODO Auto-generated method stub
-        if (showTsLabels == null || showTsLabels.length == 0) {
+        if (showLabels == null || showLabels.length == 0) {
             throw new SQLException("No column exists");
         }
-        if (column > showTsLabels.length) {
+        if (column > showLabels.length) {
             throw new SQLException(String.format("column %d does not exist", column));
         }
         if (column <= 0) {
@@ -100,7 +101,6 @@ public class TsfileMetadataResultMetadata implements ResultSetMetaData {
 
         // TEXT
         return Types.VARCHAR;
-
     }
 
     @Override
