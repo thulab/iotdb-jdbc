@@ -289,6 +289,7 @@ struct TSFetchMetadataResp{
 		4: optional string dataType
 		5: optional list<string> allColumns
 		6: optional list<list<string>> showTimeseriesList
+		7: optional set<string> showStorageGroups
 }
 
 struct TSFetchMetadataReq{

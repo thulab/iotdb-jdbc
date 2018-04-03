@@ -194,7 +194,7 @@ public class TsfileStatement implements Statement {
 			}
 		} else if (sqlToLowerCase.equals(SHOW_STORAGE_GROUP_COMMAND)) {
 			TsfileDatabaseMetadata databaseMetaData = (TsfileDatabaseMetadata) connection.getMetaData();
-			resultSet = databaseMetaData.getColumns(null, null, null, "*");
+			resultSet = databaseMetaData.getShowStorageGroups();
 			return true;
 		} else {
 			TSExecuteStatementReq execReq = new TSExecuteStatementReq(sessionHandle, sql);

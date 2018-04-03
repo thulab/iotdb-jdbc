@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 
 public class TsfileMetadataResultSet extends TsfileQueryResultSet {
@@ -19,30 +20,43 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	private ColumnSchema currentColumn;
 
-	private String currentDeltaObject;
+	private String currentDeltaObjectOrStorageGroup;
 
 	private List<String> currentTimeseries; // current row for show timeseries
+
+	private String currentStorageGroup;
 
 	private int colCount; // the number of columns for show
 	private static String[] showLabels; // headers for show
 	private int[] maxValueLength; // the max length of a column for show
 
-	public TsfileMetadataResultSet(List<ColumnSchema> columnSchemas, List<String> deltaObjectList) {
+	public TsfileMetadataResultSet(List<ColumnSchema> columnSchemas, List<String> deltaObjectList, Set<String> storageGroupSet) {
 		if (columnSchemas != null) {
 			type = MetadataType.COLUMN;
 			columnItr = columnSchemas.iterator();
-		} else if (deltaObjectList != null) {
-			type = MetadataType.DELTA_OBJECT;
-			showLabels = new String[]{"Storage Group"};
-			columnItr = deltaObjectList.iterator();
+		} else if (deltaObjectList != null || storageGroupSet != null) {
+			type = MetadataType.DELTA_OBJECT_OR_STORAGE_GROUP;
 			colCount = 1;
 			maxValueLength = new int[1]; // fixed one column
-			int tmp = 15;
-			for (String deltaObject : deltaObjectList) {
-				int len = deltaObject.length();
-				tmp = tmp > len ? tmp : len;
+			if (deltaObjectList != null) {
+				showLabels = new String[]{"Device"};
+				columnItr = deltaObjectList.iterator();
+				int tmp = 15;
+				for (String deltaObject : deltaObjectList) {
+					int len = deltaObject.length();
+					tmp = tmp > len ? tmp : len;
+				}
+				maxValueLength[0] = tmp;
+			} else if(storageGroupSet != null) {
+				showLabels = new String[]{"Storage Group"};
+				columnItr = storageGroupSet.iterator();
+				int tmp = 15;
+				for (String deltaObject : storageGroupSet) {
+					int len = deltaObject.length();
+					tmp = tmp > len ? tmp : len;
+				}
+				maxValueLength[0] = tmp;
 			}
-			maxValueLength[0] = tmp;
 		}
 	}
 
@@ -230,9 +244,9 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 					currentColumn = (ColumnSchema) columnItr.next();
 				}
 				return hasNext;
-			case DELTA_OBJECT:
+			case DELTA_OBJECT_OR_STORAGE_GROUP:
 				if (hasNext) {
-					currentDeltaObject = (String) columnItr.next();
+					currentDeltaObjectOrStorageGroup = (String) columnItr.next();
 				}
 				return hasNext;
 			case SHOW_TIMESERIES:
@@ -274,9 +288,9 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	@Override
 	public String getString(int columnIndex) throws SQLException {
 		switch (type) {
-			case DELTA_OBJECT:
+			case DELTA_OBJECT_OR_STORAGE_GROUP:
 				if (columnIndex == 1) {
-					return getString("DELTA_OBJECT");
+					return getString("DELTA_OBJECT_OR_STORAGE_GROUP");
 				}
 				break;
 			case COLUMN:
@@ -310,8 +324,8 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 					return currentColumn.dataType.toString();
 				}
 
-			case "DELTA_OBJECT":
-				return currentDeltaObject;
+			case "DELTA_OBJECT_OR_STORAGE_GROUP":
+				return currentDeltaObjectOrStorageGroup;
 
 			case "Timeseries":
 				return currentTimeseries.get(0);
@@ -339,7 +353,6 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	@Override
 	public int getType() throws SQLException {
-		//throw new SQLException("Method not supported");
 		return type.ordinal();
 	}
 
@@ -359,6 +372,6 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	}
 
 	private enum MetadataType{
-		DELTA_OBJECT, COLUMN, SHOW_TIMESERIES
+		DELTA_OBJECT_OR_STORAGE_GROUP, COLUMN, SHOW_TIMESERIES
 	}
 }
