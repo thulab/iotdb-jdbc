@@ -96,7 +96,7 @@ public class TsfileQueryResultSet implements ResultSet {
                 }
             }
         } catch (NumberFormatException e) {
-            throw new TsfileSQLException("out of range");
+            throw new TsfileSQLException("Out of range: LIMIT&SLIMIT parameter data type should be Int32.");
         }
 
         this.sql = sql;
