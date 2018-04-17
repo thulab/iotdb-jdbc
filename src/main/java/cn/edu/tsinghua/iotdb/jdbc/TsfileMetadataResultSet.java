@@ -29,6 +29,15 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	private String[] showLabels; // headers for show
 	private int[] maxValueLength; // the max length of a column for show
 
+	private static final String GET_STRING_DELTA_OBJECT_OR_STORAGE_GROUP = "DELTA_OBJECT_OR_STORAGE_GROUP";
+	private static final String GET_STRING_COLUMN_NAME= "COLUMN_NAME";
+	private static final String GET_STRING_COLUMN_TYPE= "COLUMN_TYPE";
+	private static final String GET_STRING_TIMESERIES= "Timeseries";
+	private static final String GET_STRING_STORAGE_GROUP= "Storage Group";
+	private static final String GET_STRING_DATATYPE= "DataType";
+	private static final String GET_STRING_ENCODING= "Encoding";
+
+
 	/**
 	 * Constructor used for COLUMN or DELTA_OBJECT or SHOW_STORAGE_GROUP results
 	 *
@@ -305,14 +314,14 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 		switch (type) {
 			case DELTA_OBJECT_OR_STORAGE_GROUP:
 				if (columnIndex == 1) {
-					return getString("DELTA_OBJECT_OR_STORAGE_GROUP");
+					return getString(GET_STRING_DELTA_OBJECT_OR_STORAGE_GROUP);
 				}
 				break;
 			case COLUMN:
 				if (columnIndex == 1) {
-					return getString("COLUMN_NAME");
+					return getString(GET_STRING_COLUMN_NAME);
 				} else if (columnIndex == 2) {
-					return getString("COLUMN_TYPE");
+					return getString(GET_STRING_COLUMN_TYPE);
 				}
 				break;
 			case SHOW_TIMESERIES:
@@ -330,23 +339,23 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	public String getString(String columnName) throws SQLException {
 		// use special key word to judge return content
 		switch (columnName) {
-			case "COLUMN_NAME":
+			case GET_STRING_COLUMN_NAME:
 				return currentColumn.name;
-			case "COLUMN_TYPE":
+			case GET_STRING_COLUMN_TYPE:
 				if (currentColumn.dataType != null) {
 					return currentColumn.dataType.toString();
 				}
 
-			case "DELTA_OBJECT_OR_STORAGE_GROUP":
+			case GET_STRING_DELTA_OBJECT_OR_STORAGE_GROUP:
 				return currentDeltaObjectOrStorageGroup;
 
-			case "Timeseries":
+			case GET_STRING_TIMESERIES:
 				return currentTimeseries.get(0);
-			case "Storage Group":
+			case GET_STRING_STORAGE_GROUP:
 				return currentTimeseries.get(1);
-			case "DataType":
+			case GET_STRING_DATATYPE:
 				return currentTimeseries.get(2);
-			case "Encoding":
+			case GET_STRING_ENCODING:
 				return currentTimeseries.get(3);
 
 			default:
