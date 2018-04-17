@@ -52,7 +52,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 	}
 
 	private ResultSet getShowTimeseriesFunc(String path) throws TException, SQLException {
-		TSFetchMetadataReq req = new TSFetchMetadataReq("SHOW_TIMESERIES");
+		TSFetchMetadataReq req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_SHOW_TIMESERIES_REQ);
 		req.setColumnPath(path);
 		TSFetchMetadataResp resp;
 		try {
@@ -91,7 +91,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 	}
 
 	private ResultSet getShowStorageGroupsFunc() throws TException, SQLException {
-		TSFetchMetadataReq req = new TSFetchMetadataReq("SHOW_STORAGE_GROUP");
+		TSFetchMetadataReq req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_SHOW_STORAGE_GROUP_REQ);
 		TSFetchMetadataResp resp;
 		try {
 			resp = client.fetchMetadata(req);
@@ -135,7 +135,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 
 	private ResultSet getColumnsOrDeltaObject(String catalog, String schemaPattern, String columnPattern, String deltaObjectPattern) throws TException, SQLException{
 		if(deltaObjectPattern != null && !deltaObjectPattern.trim().equals("")){
-			TSFetchMetadataReq req = new TSFetchMetadataReq("DELTA_OBEJECT");
+			TSFetchMetadataReq req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_DELTA_OBJECT_REQ);
 			TSFetchMetadataResp resp;
 			try {
 				resp = client.fetchMetadata(req);
@@ -154,7 +154,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 		if(columnPattern != null && !columnPattern.trim().equals("")){
 			TSFetchMetadataReq req;
 			if(!columnPattern.endsWith("*")){
-				req = new TSFetchMetadataReq("COLUMN");
+				req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_COLUMN_REQ);
 				req.setColumnPath(columnPattern);
 				try {
 					TSFetchMetadataResp resp = client.fetchMetadata(req);
@@ -170,7 +170,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 					throw new TException("Conncetion error when fetching column data type", e);
 				}
 			} else{
-				req = new TSFetchMetadataReq("ALL_COLUMNS");
+				req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_ALL_COLUMNS_REQ);
 				req.setColumnPath(columnPattern);
 				try {
 					TSFetchMetadataResp resp = client.fetchMetadata(req);

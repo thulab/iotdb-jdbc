@@ -36,8 +36,8 @@ public class TsfileStatement implements Statement {
 	private TS_SessionHandle sessionHandle = null;
 	private TSOperationHandle operationHandle = null;
 	private List<String> batchSQLList;
-	private static final String SHOW_TIMESERIES_COMMAND = "show timeseries";
-	private static final String SHOW_STORAGE_GROUP_COMMAND = "show storage group";
+	private static final String SHOW_TIMESERIES_COMMAND_LOWERCASE = "show timeseries";
+	private static final String SHOW_STORAGE_GROUP_COMMAND_LOWERCASE = "show storage group";
 	/**
 	 * Keep state so we can fail certain calls made after close().
 	 */
@@ -172,19 +172,29 @@ public class TsfileStatement implements Statement {
 		}
 	}
 
-	/*
-		option 1: show timeseries sql -> return new TsfileMetadataResultSet
-		option 2: query sql -> return new TsfileQueryResultSet
-		option 3: update sql -> simply execute
+
+	/**
+	 * There are four kinds of sql here:
+	 * (1) show timeseries path
+	 * (2) show storage group
+	 * (3) query sql
+	 * (4) update sql
+	 *
+	 * (1) and (2) return new TsfileMetadataResultSet
+	 * (3) return new TsfileQueryResultSet
+	 * (4) simply get executed
+	 *
+	 * @param sql
+	 * @return
+	 * @throws TException
+	 * @throws SQLException
 	 */
 	private boolean executeSQL(String sql) throws TException, SQLException {
 		isCancelled = false;
 		String sqlToLowerCase = sql.toLowerCase().trim();
-		if (sqlToLowerCase.startsWith(SHOW_TIMESERIES_COMMAND) && !sqlToLowerCase.equals(SHOW_TIMESERIES_COMMAND)) {
+		if (sqlToLowerCase.startsWith(SHOW_TIMESERIES_COMMAND_LOWERCASE)) {
 			String[] cmdSplited = sqlToLowerCase.split("\\s+");
-			if (cmdSplited.length < 3) {
-				throw new SQLException("Error format of \'SHOW TIMESERIES <PATH>\'");
-			} else if (cmdSplited.length > 3) {
+			if (cmdSplited.length != 3) {
 				throw new SQLException("Error format of \'SHOW TIMESERIES <PATH>\'");
 			} else {
 				String path = cmdSplited[2];
@@ -192,7 +202,7 @@ public class TsfileStatement implements Statement {
 				resultSet = databaseMetaData.getShowTimeseries(path);
 				return true;
 			}
-		} else if (sqlToLowerCase.equals(SHOW_STORAGE_GROUP_COMMAND)) {
+		} else if (sqlToLowerCase.equals(SHOW_STORAGE_GROUP_COMMAND_LOWERCASE)) {
 			TsfileDatabaseMetadata databaseMetaData = (TsfileDatabaseMetadata) connection.getMetaData();
 			resultSet = databaseMetaData.getShowStorageGroups();
 			return true;
@@ -532,7 +542,7 @@ public class TsfileStatement implements Statement {
 	private String getColumnType(String columnName) throws SQLException {
 		TSFetchMetadataReq req;
 		
-		req = new TSFetchMetadataReq("COLUMN");
+		req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_COLUMN_REQ);
 		req.setColumnPath(columnName);
 
 		TSFetchMetadataResp resp;

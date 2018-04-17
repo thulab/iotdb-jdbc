@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -24,50 +25,49 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	private List<String> currentTimeseries; // current row for show timeseries
 
-	private String currentStorageGroup;
-
 	private int colCount; // the number of columns for show
-	private static String[] showLabels; // headers for show
+	private String[] showLabels; // headers for show
 	private int[] maxValueLength; // the max length of a column for show
 
+	/**
+	 * Constructor used for COLUMN or DELTA_OBJECT or SHOW_STORAGE_GROUP results
+	 * @param columnSchemas
+	 * @param deltaObjectList
+	 * @param storageGroupSet
+	 */
 	public TsfileMetadataResultSet(List<ColumnSchema> columnSchemas, List<String> deltaObjectList, Set<String> storageGroupSet) {
-		if (columnSchemas != null) {
+		if (columnSchemas != null) { // 'showLabels' is not needed in this type
 			type = MetadataType.COLUMN;
 			columnItr = columnSchemas.iterator();
 		} else if (deltaObjectList != null || storageGroupSet != null) {
 			type = MetadataType.DELTA_OBJECT_OR_STORAGE_GROUP;
 			colCount = 1;
-			maxValueLength = new int[1]; // fixed one column
+			maxValueLength = new int[1]; // one fixed column
 			if (deltaObjectList != null) {
 				showLabels = new String[]{"Device"};
 				columnItr = deltaObjectList.iterator();
-				int tmp = 15;
-				for (String deltaObject : deltaObjectList) {
-					int len = deltaObject.length();
-					tmp = tmp > len ? tmp : len;
-				}
-				maxValueLength[0] = tmp;
-			} else if(storageGroupSet != null) {
+				int tmp = showLabels[0].length();
+				maxValueLength[0] = getMaxValueLength(deltaObjectList, tmp);
+			} else {
 				showLabels = new String[]{"Storage Group"};
 				columnItr = storageGroupSet.iterator();
-				int tmp = 15;
-				for (String deltaObject : storageGroupSet) {
-					int len = deltaObject.length();
-					tmp = tmp > len ? tmp : len;
-				}
-				maxValueLength[0] = tmp;
+				int tmp = showLabels[0].length();
+				maxValueLength[0] = getMaxValueLength(new ArrayList<String>(storageGroupSet), tmp);
 			}
 		}
 	}
 
-	// for show timeseries result
+	/**
+	 * Constructor used for SHOW_TIMESERIES_PATH results
+	 * @param tslist
+	 */
 	public TsfileMetadataResultSet(List<List<String>> tslist) {
 		type = MetadataType.SHOW_TIMESERIES;
 		showLabels = new String[]{"Timeseries", "Storage Group", "DataType", "Encoding"};
 		colCount = 4;
 		columnItr = tslist.iterator();
 		maxValueLength = new int[colCount];
-		for (int i = 0; i < colCount; i++) {
+		for (int i = 0; i < colCount; i++) { // get the max value length of each column for table display
 			int tmp = showLabels[i].length();
 			for (List<String> tsrow : tslist) {
 				int len = tsrow.get(i).length();
@@ -75,6 +75,20 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 			}
 			maxValueLength[i] = tmp;
 		}
+	}
+
+	/**
+	 *
+	 * @param ObjectList
+	 * @param initLength
+	 * @return the max string length of a column
+	 */
+	private int getMaxValueLength(List<String> ObjectList, int initLength) {
+		for (String Object : ObjectList) {
+			int len = Object.length();
+			initLength = initLength > len ? initLength : len;
+		}
+		return initLength;
 	}
 
 	public int getMaxValueLength(int columnIndex) throws SQLException { // start from 1
@@ -301,10 +315,8 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 				}
 				break;
 			case SHOW_TIMESERIES:
-				for(int i = 1; i <= colCount; i++) {
-					if(columnIndex == i) {
-						return getString(showLabels[i-1]);
-					}
+				if (columnIndex >= 1 && columnIndex <= colCount) {
+					return getString(showLabels[columnIndex - 1]);
 				}
 				break;
 			default:
