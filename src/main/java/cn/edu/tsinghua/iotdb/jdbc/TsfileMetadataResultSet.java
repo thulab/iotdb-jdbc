@@ -31,6 +31,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	/**
 	 * Constructor used for COLUMN or DELTA_OBJECT or SHOW_STORAGE_GROUP results
+	 *
 	 * @param columnSchemas
 	 * @param deltaObjectList
 	 * @param storageGroupSet
@@ -59,6 +60,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	/**
 	 * Constructor used for SHOW_TIMESERIES_PATH results
+	 *
 	 * @param tslist
 	 */
 	public TsfileMetadataResultSet(List<List<String>> tslist) {
@@ -78,7 +80,6 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	}
 
 	/**
-	 *
 	 * @param ObjectList
 	 * @param initLength
 	 * @return the max string length of a column
@@ -91,10 +92,14 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 		return initLength;
 	}
 
-	public int getMaxValueLength(int columnIndex) throws SQLException { // start from 1
+	private void checkType() throws SQLException {
 		if (type == MetadataType.COLUMN) {
 			throw new SQLException("Method not supported");
 		}
+	}
+
+	public int getMaxValueLength(int columnIndex) throws SQLException { // start from 1
+		checkType();
 
 		if (columnIndex >= 1 && columnIndex <= colCount) {
 			return maxValueLength[columnIndex - 1];
@@ -106,16 +111,12 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	}
 
 	public int getColCount() throws SQLException {
-		if (type == MetadataType.COLUMN) {
-			throw new SQLException("Method not supported");
-		}
+		checkType();
 		return colCount;
 	}
 
 	public String[] getShowLabels() throws SQLException {
-		if (type == MetadataType.COLUMN) {
-			throw new SQLException("Method not supported");
-		}
+		checkType();
 		return showLabels;
 	}
 
@@ -243,7 +244,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	@Override
 	public ResultSetMetaData getMetaData() throws SQLException {
 		if (type == MetadataType.COLUMN) {
-			throw new SQLException("Method not supported");
+			throw new SQLException("Method not supported for COLUMN type");
 		}
 		return new TsfileMetadataResultMetadata(showLabels);
 
@@ -265,7 +266,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 				return hasNext;
 			case SHOW_TIMESERIES:
 				if (hasNext) {
-					currentTimeseries = (List<String>) columnItr.next();
+					currentTimeseries = (List<String>) (columnItr.next());
 				}
 				return hasNext;
 			default:
@@ -347,6 +348,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 				return currentTimeseries.get(2);
 			case "Encoding":
 				return currentTimeseries.get(3);
+
 			default:
 				break;
 		}
