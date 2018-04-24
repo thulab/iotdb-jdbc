@@ -37,6 +37,7 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
 
   private static final org.apache.thrift.protocol.TField TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("type", org.apache.thrift.protocol.TType.STRING, (short)1);
   private static final org.apache.thrift.protocol.TField COLUMN_PATH_FIELD_DESC = new org.apache.thrift.protocol.TField("columnPath", org.apache.thrift.protocol.TType.STRING, (short)2);
+  private static final org.apache.thrift.protocol.TField BATCH_FETCH_IDX_FIELD_DESC = new org.apache.thrift.protocol.TField("batchFetchIdx", org.apache.thrift.protocol.TType.I32, (short)3);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -46,11 +47,13 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
 
   public String type; // required
   public String columnPath; // optional
+  public int batchFetchIdx; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     TYPE((short)1, "type"),
-    COLUMN_PATH((short)2, "columnPath");
+    COLUMN_PATH((short)2, "columnPath"),
+    BATCH_FETCH_IDX((short)3, "batchFetchIdx");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -69,6 +72,8 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
           return TYPE;
         case 2: // COLUMN_PATH
           return COLUMN_PATH;
+        case 3: // BATCH_FETCH_IDX
+          return BATCH_FETCH_IDX;
         default:
           return null;
       }
@@ -109,7 +114,9 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
   }
 
   // isset id assignments
-  private _Fields optionals[] = {_Fields.COLUMN_PATH};
+  private static final int __BATCHFETCHIDX_ISSET_ID = 0;
+  private byte __isset_bitfield = 0;
+  private _Fields optionals[] = {_Fields.COLUMN_PATH,_Fields.BATCH_FETCH_IDX};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -117,6 +124,8 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.COLUMN_PATH, new org.apache.thrift.meta_data.FieldMetaData("columnPath", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.BATCH_FETCH_IDX, new org.apache.thrift.meta_data.FieldMetaData("batchFetchIdx", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TSFetchMetadataReq.class, metaDataMap);
   }
@@ -135,12 +144,14 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
    * Performs a deep copy on <i>other</i>.
    */
   public TSFetchMetadataReq(TSFetchMetadataReq other) {
+    __isset_bitfield = other.__isset_bitfield;
     if (other.isSetType()) {
       this.type = other.type;
     }
     if (other.isSetColumnPath()) {
       this.columnPath = other.columnPath;
     }
+    this.batchFetchIdx = other.batchFetchIdx;
   }
 
   public TSFetchMetadataReq deepCopy() {
@@ -151,6 +162,8 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
   public void clear() {
     this.type = null;
     this.columnPath = null;
+    setBatchFetchIdxIsSet(false);
+    this.batchFetchIdx = 0;
   }
 
   public String getType() {
@@ -201,6 +214,29 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
     }
   }
 
+  public int getBatchFetchIdx() {
+    return this.batchFetchIdx;
+  }
+
+  public TSFetchMetadataReq setBatchFetchIdx(int batchFetchIdx) {
+    this.batchFetchIdx = batchFetchIdx;
+    setBatchFetchIdxIsSet(true);
+    return this;
+  }
+
+  public void unsetBatchFetchIdx() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __BATCHFETCHIDX_ISSET_ID);
+  }
+
+  /** Returns true if field batchFetchIdx is set (has been assigned a value) and false otherwise */
+  public boolean isSetBatchFetchIdx() {
+    return EncodingUtils.testBit(__isset_bitfield, __BATCHFETCHIDX_ISSET_ID);
+  }
+
+  public void setBatchFetchIdxIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __BATCHFETCHIDX_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case TYPE:
@@ -219,6 +255,14 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
       }
       break;
 
+    case BATCH_FETCH_IDX:
+      if (value == null) {
+        unsetBatchFetchIdx();
+      } else {
+        setBatchFetchIdx((Integer)value);
+      }
+      break;
+
     }
   }
 
@@ -229,6 +273,9 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
 
     case COLUMN_PATH:
       return getColumnPath();
+
+    case BATCH_FETCH_IDX:
+      return Integer.valueOf(getBatchFetchIdx());
 
     }
     throw new IllegalStateException();
@@ -245,6 +292,8 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
       return isSetType();
     case COLUMN_PATH:
       return isSetColumnPath();
+    case BATCH_FETCH_IDX:
+      return isSetBatchFetchIdx();
     }
     throw new IllegalStateException();
   }
@@ -280,6 +329,15 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
         return false;
     }
 
+    boolean this_present_batchFetchIdx = true && this.isSetBatchFetchIdx();
+    boolean that_present_batchFetchIdx = true && that.isSetBatchFetchIdx();
+    if (this_present_batchFetchIdx || that_present_batchFetchIdx) {
+      if (!(this_present_batchFetchIdx && that_present_batchFetchIdx))
+        return false;
+      if (this.batchFetchIdx != that.batchFetchIdx)
+        return false;
+    }
+
     return true;
   }
 
@@ -312,6 +370,16 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
     }
     if (isSetColumnPath()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.columnPath, other.columnPath);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetBatchFetchIdx()).compareTo(other.isSetBatchFetchIdx());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetBatchFetchIdx()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.batchFetchIdx, other.batchFetchIdx);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -353,6 +421,12 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
       }
       first = false;
     }
+    if (isSetBatchFetchIdx()) {
+      if (!first) sb.append(", ");
+      sb.append("batchFetchIdx:");
+      sb.append(this.batchFetchIdx);
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -375,6 +449,8 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bitfield = 0;
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -415,6 +491,14 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 3: // BATCH_FETCH_IDX
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.batchFetchIdx = iprot.readI32();
+              struct.setBatchFetchIdxIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -442,6 +526,11 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
           oprot.writeFieldEnd();
         }
       }
+      if (struct.isSetBatchFetchIdx()) {
+        oprot.writeFieldBegin(BATCH_FETCH_IDX_FIELD_DESC);
+        oprot.writeI32(struct.batchFetchIdx);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -464,9 +553,15 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
       if (struct.isSetColumnPath()) {
         optionals.set(0);
       }
-      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetBatchFetchIdx()) {
+        optionals.set(1);
+      }
+      oprot.writeBitSet(optionals, 2);
       if (struct.isSetColumnPath()) {
         oprot.writeString(struct.columnPath);
+      }
+      if (struct.isSetBatchFetchIdx()) {
+        oprot.writeI32(struct.batchFetchIdx);
       }
     }
 
@@ -475,10 +570,14 @@ public class TSFetchMetadataReq implements org.apache.thrift.TBase<TSFetchMetada
       TTupleProtocol iprot = (TTupleProtocol) prot;
       struct.type = iprot.readString();
       struct.setTypeIsSet(true);
-      BitSet incoming = iprot.readBitSet(1);
+      BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
         struct.columnPath = iprot.readString();
         struct.setColumnPathIsSet(true);
+      }
+      if (incoming.get(1)) {
+        struct.batchFetchIdx = iprot.readI32();
+        struct.setBatchFetchIdxIsSet(true);
       }
     }
   }

@@ -42,6 +42,8 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
   private static final org.apache.thrift.protocol.TField ALL_COLUMNS_FIELD_DESC = new org.apache.thrift.protocol.TField("allColumns", org.apache.thrift.protocol.TType.LIST, (short)5);
   private static final org.apache.thrift.protocol.TField SHOW_TIMESERIES_LIST_FIELD_DESC = new org.apache.thrift.protocol.TField("showTimeseriesList", org.apache.thrift.protocol.TType.LIST, (short)6);
   private static final org.apache.thrift.protocol.TField SHOW_STORAGE_GROUPS_FIELD_DESC = new org.apache.thrift.protocol.TField("showStorageGroups", org.apache.thrift.protocol.TType.SET, (short)7);
+  private static final org.apache.thrift.protocol.TField BATCH_FETCH_SIZE_FIELD_DESC = new org.apache.thrift.protocol.TField("batchFetchSize", org.apache.thrift.protocol.TType.I32, (short)8);
+  private static final org.apache.thrift.protocol.TField HAS_RESULT_SET_FIELD_DESC = new org.apache.thrift.protocol.TField("hasResultSet", org.apache.thrift.protocol.TType.BOOL, (short)9);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -56,6 +58,8 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
   public List<String> allColumns; // optional
   public List<List<String>> showTimeseriesList; // optional
   public Set<String> showStorageGroups; // optional
+  public int batchFetchSize; // optional
+  public boolean hasResultSet; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -65,7 +69,9 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     DATA_TYPE((short)4, "dataType"),
     ALL_COLUMNS((short)5, "allColumns"),
     SHOW_TIMESERIES_LIST((short)6, "showTimeseriesList"),
-    SHOW_STORAGE_GROUPS((short)7, "showStorageGroups");
+    SHOW_STORAGE_GROUPS((short)7, "showStorageGroups"),
+    BATCH_FETCH_SIZE((short)8, "batchFetchSize"),
+    HAS_RESULT_SET((short)9, "hasResultSet");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -94,6 +100,10 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
           return SHOW_TIMESERIES_LIST;
         case 7: // SHOW_STORAGE_GROUPS
           return SHOW_STORAGE_GROUPS;
+        case 8: // BATCH_FETCH_SIZE
+          return BATCH_FETCH_SIZE;
+        case 9: // HAS_RESULT_SET
+          return HAS_RESULT_SET;
         default:
           return null;
       }
@@ -134,7 +144,10 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
   }
 
   // isset id assignments
-  private _Fields optionals[] = {_Fields.METADATA_IN_JSON,_Fields.DELTA_OBJECT_MAP,_Fields.DATA_TYPE,_Fields.ALL_COLUMNS,_Fields.SHOW_TIMESERIES_LIST,_Fields.SHOW_STORAGE_GROUPS};
+  private static final int __BATCHFETCHSIZE_ISSET_ID = 0;
+  private static final int __HASRESULTSET_ISSET_ID = 1;
+  private byte __isset_bitfield = 0;
+  private _Fields optionals[] = {_Fields.METADATA_IN_JSON,_Fields.DELTA_OBJECT_MAP,_Fields.DATA_TYPE,_Fields.ALL_COLUMNS,_Fields.SHOW_TIMESERIES_LIST,_Fields.SHOW_STORAGE_GROUPS,_Fields.BATCH_FETCH_SIZE,_Fields.HAS_RESULT_SET};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -159,6 +172,10 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     tmpMap.put(_Fields.SHOW_STORAGE_GROUPS, new org.apache.thrift.meta_data.FieldMetaData("showStorageGroups", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.SetMetaData(org.apache.thrift.protocol.TType.SET, 
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
+    tmpMap.put(_Fields.BATCH_FETCH_SIZE, new org.apache.thrift.meta_data.FieldMetaData("batchFetchSize", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+    tmpMap.put(_Fields.HAS_RESULT_SET, new org.apache.thrift.meta_data.FieldMetaData("hasResultSet", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TSFetchMetadataResp.class, metaDataMap);
   }
@@ -177,6 +194,7 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
    * Performs a deep copy on <i>other</i>.
    */
   public TSFetchMetadataResp(TSFetchMetadataResp other) {
+    __isset_bitfield = other.__isset_bitfield;
     if (other.isSetStatus()) {
       this.status = new TS_Status(other.status);
     }
@@ -217,6 +235,8 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       Set<String> __this__showStorageGroups = new HashSet<String>(other.showStorageGroups);
       this.showStorageGroups = __this__showStorageGroups;
     }
+    this.batchFetchSize = other.batchFetchSize;
+    this.hasResultSet = other.hasResultSet;
   }
 
   public TSFetchMetadataResp deepCopy() {
@@ -232,6 +252,10 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     this.allColumns = null;
     this.showTimeseriesList = null;
     this.showStorageGroups = null;
+    setBatchFetchSizeIsSet(false);
+    this.batchFetchSize = 0;
+    setHasResultSetIsSet(false);
+    this.hasResultSet = false;
   }
 
   public TS_Status getStatus() {
@@ -458,6 +482,52 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     }
   }
 
+  public int getBatchFetchSize() {
+    return this.batchFetchSize;
+  }
+
+  public TSFetchMetadataResp setBatchFetchSize(int batchFetchSize) {
+    this.batchFetchSize = batchFetchSize;
+    setBatchFetchSizeIsSet(true);
+    return this;
+  }
+
+  public void unsetBatchFetchSize() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __BATCHFETCHSIZE_ISSET_ID);
+  }
+
+  /** Returns true if field batchFetchSize is set (has been assigned a value) and false otherwise */
+  public boolean isSetBatchFetchSize() {
+    return EncodingUtils.testBit(__isset_bitfield, __BATCHFETCHSIZE_ISSET_ID);
+  }
+
+  public void setBatchFetchSizeIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __BATCHFETCHSIZE_ISSET_ID, value);
+  }
+
+  public boolean isHasResultSet() {
+    return this.hasResultSet;
+  }
+
+  public TSFetchMetadataResp setHasResultSet(boolean hasResultSet) {
+    this.hasResultSet = hasResultSet;
+    setHasResultSetIsSet(true);
+    return this;
+  }
+
+  public void unsetHasResultSet() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __HASRESULTSET_ISSET_ID);
+  }
+
+  /** Returns true if field hasResultSet is set (has been assigned a value) and false otherwise */
+  public boolean isSetHasResultSet() {
+    return EncodingUtils.testBit(__isset_bitfield, __HASRESULTSET_ISSET_ID);
+  }
+
+  public void setHasResultSetIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __HASRESULTSET_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case STATUS:
@@ -516,6 +586,22 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       }
       break;
 
+    case BATCH_FETCH_SIZE:
+      if (value == null) {
+        unsetBatchFetchSize();
+      } else {
+        setBatchFetchSize((Integer)value);
+      }
+      break;
+
+    case HAS_RESULT_SET:
+      if (value == null) {
+        unsetHasResultSet();
+      } else {
+        setHasResultSet((Boolean)value);
+      }
+      break;
+
     }
   }
 
@@ -542,6 +628,12 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     case SHOW_STORAGE_GROUPS:
       return getShowStorageGroups();
 
+    case BATCH_FETCH_SIZE:
+      return Integer.valueOf(getBatchFetchSize());
+
+    case HAS_RESULT_SET:
+      return Boolean.valueOf(isHasResultSet());
+
     }
     throw new IllegalStateException();
   }
@@ -567,6 +659,10 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       return isSetShowTimeseriesList();
     case SHOW_STORAGE_GROUPS:
       return isSetShowStorageGroups();
+    case BATCH_FETCH_SIZE:
+      return isSetBatchFetchSize();
+    case HAS_RESULT_SET:
+      return isSetHasResultSet();
     }
     throw new IllegalStateException();
   }
@@ -644,6 +740,24 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       if (!(this_present_showStorageGroups && that_present_showStorageGroups))
         return false;
       if (!this.showStorageGroups.equals(that.showStorageGroups))
+        return false;
+    }
+
+    boolean this_present_batchFetchSize = true && this.isSetBatchFetchSize();
+    boolean that_present_batchFetchSize = true && that.isSetBatchFetchSize();
+    if (this_present_batchFetchSize || that_present_batchFetchSize) {
+      if (!(this_present_batchFetchSize && that_present_batchFetchSize))
+        return false;
+      if (this.batchFetchSize != that.batchFetchSize)
+        return false;
+    }
+
+    boolean this_present_hasResultSet = true && this.isSetHasResultSet();
+    boolean that_present_hasResultSet = true && that.isSetHasResultSet();
+    if (this_present_hasResultSet || that_present_hasResultSet) {
+      if (!(this_present_hasResultSet && that_present_hasResultSet))
+        return false;
+      if (this.hasResultSet != that.hasResultSet)
         return false;
     }
 
@@ -729,6 +843,26 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
     }
     if (isSetShowStorageGroups()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.showStorageGroups, other.showStorageGroups);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetBatchFetchSize()).compareTo(other.isSetBatchFetchSize());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetBatchFetchSize()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.batchFetchSize, other.batchFetchSize);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHasResultSet()).compareTo(other.isSetHasResultSet());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetHasResultSet()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.hasResultSet, other.hasResultSet);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -820,6 +954,18 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       }
       first = false;
     }
+    if (isSetBatchFetchSize()) {
+      if (!first) sb.append(", ");
+      sb.append("batchFetchSize:");
+      sb.append(this.batchFetchSize);
+      first = false;
+    }
+    if (isSetHasResultSet()) {
+      if (!first) sb.append(", ");
+      sb.append("hasResultSet:");
+      sb.append(this.hasResultSet);
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -845,6 +991,8 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bitfield = 0;
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -988,6 +1136,22 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 8: // BATCH_FETCH_SIZE
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.batchFetchSize = iprot.readI32();
+              struct.setBatchFetchSizeIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 9: // HAS_RESULT_SET
+            if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+              struct.hasResultSet = iprot.readBool();
+              struct.setHasResultSetIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -1093,6 +1257,16 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
           oprot.writeFieldEnd();
         }
       }
+      if (struct.isSetBatchFetchSize()) {
+        oprot.writeFieldBegin(BATCH_FETCH_SIZE_FIELD_DESC);
+        oprot.writeI32(struct.batchFetchSize);
+        oprot.writeFieldEnd();
+      }
+      if (struct.isSetHasResultSet()) {
+        oprot.writeFieldBegin(HAS_RESULT_SET_FIELD_DESC);
+        oprot.writeBool(struct.hasResultSet);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -1130,7 +1304,13 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       if (struct.isSetShowStorageGroups()) {
         optionals.set(5);
       }
-      oprot.writeBitSet(optionals, 6);
+      if (struct.isSetBatchFetchSize()) {
+        optionals.set(6);
+      }
+      if (struct.isSetHasResultSet()) {
+        optionals.set(7);
+      }
+      oprot.writeBitSet(optionals, 8);
       if (struct.isSetMetadataInJson()) {
         oprot.writeString(struct.metadataInJson);
       }
@@ -1186,6 +1366,12 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
           }
         }
       }
+      if (struct.isSetBatchFetchSize()) {
+        oprot.writeI32(struct.batchFetchSize);
+      }
+      if (struct.isSetHasResultSet()) {
+        oprot.writeBool(struct.hasResultSet);
+      }
     }
 
     @Override
@@ -1194,7 +1380,7 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
       struct.status = new TS_Status();
       struct.status.read(iprot);
       struct.setStatusIsSet(true);
-      BitSet incoming = iprot.readBitSet(6);
+      BitSet incoming = iprot.readBitSet(8);
       if (incoming.get(0)) {
         struct.metadataInJson = iprot.readString();
         struct.setMetadataInJsonIsSet(true);
@@ -1274,6 +1460,14 @@ public class TSFetchMetadataResp implements org.apache.thrift.TBase<TSFetchMetad
           }
         }
         struct.setShowStorageGroupsIsSet(true);
+      }
+      if (incoming.get(6)) {
+        struct.batchFetchSize = iprot.readI32();
+        struct.setBatchFetchSizeIsSet(true);
+      }
+      if (incoming.get(7)) {
+        struct.hasResultSet = iprot.readBool();
+        struct.setHasResultSetIsSet(true);
       }
     }
   }

@@ -29,13 +29,13 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	private String[] showLabels; // headers for show
 	private int[] maxValueLength; // the max length of a column for show
 
-	private static final String GET_STRING_DELTA_OBJECT_OR_STORAGE_GROUP = "DELTA_OBJECT_OR_STORAGE_GROUP";
-	private static final String GET_STRING_COLUMN_NAME= "COLUMN_NAME";
-	private static final String GET_STRING_COLUMN_TYPE= "COLUMN_TYPE";
-	private static final String GET_STRING_TIMESERIES= "Timeseries";
-	private static final String GET_STRING_STORAGE_GROUP= "Storage Group";
-	private static final String GET_STRING_DATATYPE= "DataType";
-	private static final String GET_STRING_ENCODING= "Encoding";
+	public static final String GET_STRING_DELTA_OBJECT_OR_STORAGE_GROUP = "DELTA_OBJECT_OR_STORAGE_GROUP";
+	public static final String GET_STRING_COLUMN_NAME= "COLUMN_NAME";
+	public static final String GET_STRING_COLUMN_TYPE= "COLUMN_TYPE";
+	public static final String GET_STRING_TIMESERIES= "Timeseries";
+	public static final String GET_STRING_STORAGE_GROUP= "Storage Group";
+	public static final String GET_STRING_DATATYPE= "DataType";
+	public static final String GET_STRING_ENCODING= "Encoding";
 
 
 	/**
@@ -55,6 +55,8 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 			maxValueLength = new int[1]; // one fixed column
 			if (deltaObjectList != null) {
 				showLabels = new String[]{"Device"};
+				System.out.println("how many?"+deltaObjectList.size());
+				System.out.println(deltaObjectList.get(0));
 				columnItr = deltaObjectList.iterator();
 				int tmp = showLabels[0].length();
 				maxValueLength[0] = getMaxValueLength(deltaObjectList, tmp);
