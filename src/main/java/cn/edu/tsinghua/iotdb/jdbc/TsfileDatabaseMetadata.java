@@ -1246,6 +1246,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 	}
 
 	@Override
+	@Deprecated
 	public String toString() {
 		try {
 			return getFullTimeseries();
@@ -1267,6 +1268,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 		return null;
 	}
 
+	@Deprecated
 	private String getFullTimeseries() throws TException, TsfileSQLException{
 		TSFetchMetadataReq req = new TSFetchMetadataReq("METADATA_IN_JSON");
 		TSFetchMetadataResp resp;
@@ -1277,33 +1279,32 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 
 	private String currentBatchTimeseries;
 	private boolean hasNextBatchTimeseries = false;
-	private int batchFetchIdx=0; // 重要的初始化
-	public boolean hasNextBatchTimeseries() throws TException, TsfileSQLException{
-		if(hasNextBatchTimeseries) {
+	private int batchFetchIdx = 0;
+	private int batchFetchSize = TsfileJDBCConfig.metaDataBatchFetchSize;
+
+	public boolean hasNextBatchShowTimeseries() throws TException, TsfileSQLException {
+		if (hasNextBatchTimeseries) {
 			return true;
 		}
 		TSFetchMetadataReq req = new TSFetchMetadataReq("METADATA_IN_JSON");
-		req.setBatchFetchIdx(batchFetchIdx); // 客户端记着自己读到哪里了
+		req.setBatchFetchIdx(batchFetchIdx);
+		req.setBatchFetchSize(batchFetchSize);
 		TSFetchMetadataResp resp;
 		resp = client.fetchMetadata(req);
 		Utils.verifySuccess(resp.getStatus());
-		if(resp.hasResultSet) {
+		if (resp.hasResultSet) {
 			currentBatchTimeseries = resp.getMetadataInJson();
-			//batchFetchIdx = resp.getBatchFetchIdx(); // 客户端根据服务器返回的进度更新自己这里记录的进度
-			batchFetchIdx += resp.getBatchFetchSize();
-			//TODO 这其实要求每次服务器严格读取那么多，而不像queryDataSet可以多一点少一点fetchsize，
-			// 严格之后，客户端就可以自增来预测服务器读到那儿了
-			// 最后一次读完之后，客户端指向最后还超过的地方，服务器执行自然会发现没有了
+			batchFetchIdx += batchFetchSize;
 			hasNextBatchTimeseries = true;
 			return true;
-		}
-		else {
+		} else {
 			currentBatchTimeseries = null;
-			batchFetchIdx = 0; // 重要的归零 下一次调用还是从0开始
+			batchFetchIdx = 0;
 			return false;
 		}
 	}
-	public String getCurrentBatchTimeseries() {
+
+	public String getCurrentBatchShowTimeseries() {
 		hasNextBatchTimeseries = false;
 		return currentBatchTimeseries;
 	}

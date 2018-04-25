@@ -1,6 +1,6 @@
 package cn.edu.tsinghua.iotdb.jdbc;
 
-public class TsfileJDBCConfig {
+public class  TsfileJDBCConfig {
 	/**
 	 * The required prefix for the connection URL.
 	 */
@@ -30,5 +30,10 @@ public class TsfileJDBCConfig {
 	public static int connectionTimeoutInMs = 0;
 
 	public static String JDBC_DRIVER_NAME = "cn.edu.tsinghua.iotdb.jdbc.TsfileDriver";
+
+	/**
+	 * The number of timeseries fetched in a batch when executing sql 'show timeseries'
+	 */
+	public static int metaDataBatchFetchSize = 100;
 	
 }

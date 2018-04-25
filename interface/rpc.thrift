@@ -290,15 +290,14 @@ struct TSFetchMetadataResp{
 		5: optional list<string> allColumns
 		6: optional list<list<string>> showTimeseriesList
 		7: optional set<string> showStorageGroups
-		//8: optional i32 batchFetchIdx
-		8: optional i32 batchFetchSize
-		9: optional bool hasResultSet
+		8: optional bool hasResultSet
 }
 
 struct TSFetchMetadataReq{
 		1: required string type
 		2: optional string columnPath
 		3: optional i32 batchFetchIdx
+		4: optional i32 batchFetchSize
 }
 
 
