@@ -34,6 +34,6 @@ public class  TsfileJDBCConfig {
 	/**
 	 * The number of timeseries fetched in a batch when executing sql 'show timeseries'
 	 */
-	public static int metaDataBatchFetchSize = 1000;
+	public static int metaDataBatchFetchSize = 10000;
 	
 }
