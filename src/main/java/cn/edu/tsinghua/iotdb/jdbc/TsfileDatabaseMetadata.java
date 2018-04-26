@@ -1258,14 +1258,14 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 					System.out.println("Fail to get all timeseries "
 							+ "info after reconnecting. please check server status");
 				} catch (TsfileSQLException e3) {
-					System.out.println("Fail to get all timeseries info because: "+e3);
+					System.out.println(e3);
 				}
 			} else {
 				System.out.println("Fail to reconnect to server "
 						+ "when getting all timeseries info. please check server status");
 			}
 		} catch (TsfileSQLException e4) {
-			System.out.println("Fail to get all timeseries info because: "+e4);
+			System.out.println(e4);
 		}
 		return null;
 	}
