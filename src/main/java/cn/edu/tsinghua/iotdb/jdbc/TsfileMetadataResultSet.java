@@ -55,8 +55,6 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 			maxValueLength = new int[1]; // one fixed column
 			if (deltaObjectList != null) {
 				showLabels = new String[]{"Device"};
-				System.out.println("how many?"+deltaObjectList.size());
-				System.out.println(deltaObjectList.get(0));
 				columnItr = deltaObjectList.iterator();
 				int tmp = showLabels[0].length();
 				maxValueLength[0] = getMaxValueLength(deltaObjectList, tmp);
