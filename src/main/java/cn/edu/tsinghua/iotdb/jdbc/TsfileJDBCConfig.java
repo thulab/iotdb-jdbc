@@ -30,5 +30,10 @@ public class TsfileJDBCConfig {
 	public static int connectionTimeoutInMs = 0;
 
 	public static String JDBC_DRIVER_NAME = "cn.edu.tsinghua.iotdb.jdbc.TsfileDriver";
+
+	/**
+	 * The number of timeseries fetched in a batch when executing sql 'show timeseries <path>'
+	 */
+	public static int metaDataBatchFetchSize = 10000;
 	
 }
