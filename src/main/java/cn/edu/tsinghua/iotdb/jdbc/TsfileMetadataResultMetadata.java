@@ -24,9 +24,16 @@ import java.sql.Types;
    */
 public class TsfileMetadataResultMetadata implements ResultSetMetaData {
     private String[] showLabels;
+    private int[] maxValueLength;
 
-    public TsfileMetadataResultMetadata(String[] showLabels) {
+    public TsfileMetadataResultMetadata(String[] showLabels, int[] maxValueLength) {
         this.showLabels = showLabels;
+        this.maxValueLength = maxValueLength;
+    }
+
+    public int getMaxValueLength(int columnIndex) throws SQLException { // start from 1
+        checkColumnIndex(columnIndex);
+        return maxValueLength[columnIndex - 1];
     }
 
     @Override

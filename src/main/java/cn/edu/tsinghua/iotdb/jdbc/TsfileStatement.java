@@ -198,7 +198,8 @@ public class TsfileStatement implements Statement {
                 throw new SQLException("Error format of \'SHOW TIMESERIES <PATH>\'");
             } else {
                 String path = cmdSplited[2];
-                resultSet = new TsfileMetadataResultSet(path, client);
+                TsfileDatabaseMetadata databaseMetaData = (TsfileDatabaseMetadata) connection.getMetaData();
+                resultSet = databaseMetaData.getShowTimeseriesPath(path);
                 return true;
             }
         } else if (sqlToLowerCase.equals(SHOW_STORAGE_GROUP_COMMAND_LOWERCASE)) {
