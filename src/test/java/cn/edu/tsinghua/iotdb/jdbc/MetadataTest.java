@@ -33,7 +33,7 @@ public class MetadataTest {
      */
     public static void AllColumns() {
         try {
-            ResultSet resultSet = databaseMetaData.getColumns("col", "root.ln.*.wt01", null, null);
+            ResultSet resultSet = databaseMetaData.getColumns("col", "root", null, null);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             int colCount = resultSetMetaData.getColumnCount();
             // print header
@@ -162,12 +162,7 @@ public class MetadataTest {
      * show metadata in json
      */
     public static void ShowTimeseriesInJson() {
-        String metadataInJson = null;
-        try {
-            metadataInJson = databaseMetaData.toString();
-        } catch (OutOfMemoryError outOfMemoryError) {
-            System.out.println(outOfMemoryError);
-        }
+        String metadataInJson = databaseMetaData.toString();
         System.out.println(metadataInJson);
     }
 }

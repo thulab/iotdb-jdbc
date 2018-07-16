@@ -1148,21 +1148,25 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
     public String toString() {
         try {
             return getFullTimeseries();
+        } catch (TsfileSQLException e) {
+            System.out.println(e);
         } catch (TException e) {
             boolean flag = connection.reconnect();
             this.client = connection.client;
             if (flag) {
                 try {
                     return getFullTimeseries();
+                } catch (TsfileSQLException e1) {
+                    System.out.println(e1);
                 } catch (TException e2) {
                     System.out.println("Fail to get all timeseries "
                             + "info after reconnecting. please check server status");
-                } catch (TsfileSQLException e1) {}
+                }
             } else {
                 System.out.println("Fail to reconnect to server "
                         + "when getting all timeseries info. please check server status");
             }
-        } catch (TsfileSQLException e) {}
+        }
         return null;
     }
 
