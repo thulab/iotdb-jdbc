@@ -2,39 +2,166 @@ package cn.edu.tsinghua.iotdb.jdbc;
 
 import java.sql.*;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 public class MetadataTest {
-    Connection connection = null;
-    DatabaseMetaData databaseMetaData;
+    public static int[] maxValueLengthForShow = new int[]{40, 40, 10, 10};
+    public static DatabaseMetaData databaseMetaData;
 
-    @Before
-    public void setUp() throws Exception {
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
         Class.forName(TsfileJDBCConfig.JDBC_DRIVER_NAME);
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection("jdbc:tsfile://127.0.0.1:6667/", "root",
-                    "root");
+            connection = DriverManager.getConnection("jdbc:tsfile://127.0.0.1:6667/", "root", "root");
             databaseMetaData = connection.getMetaData();
+            AllColumns();
+            System.out.println("----------------------------------------------------------------");
+            DeltaObject();
+            System.out.println("----------------------------------------------------------------");
+            ShowTimeseriesPath();
+            System.out.println("----------------------------------------------------------------");
+            ShowStorageGroup();
+            System.out.println("----------------------------------------------------------------");
+            ShowTimeseriesInJson();
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            connection.close();
+        }
+    }
+
+    /**
+     * get all columns' name under a given path
+     */
+    public static void AllColumns() {
+        try {
+            ResultSet resultSet = databaseMetaData.getColumns("col", "root.ln.*.wt01", null, null);
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+            int colCount = resultSetMetaData.getColumnCount();
+            // print header
+            System.out.printf("|");
+            for (int i = 1; i < colCount + 1; i++) {
+                String formatStr = "%" + maxValueLengthForShow[i - 1] + "s|";
+                System.out.printf(formatStr, resultSetMetaData.getColumnName(i));
+            }
+            // print content
+            while (resultSet.next()) {
+                System.out.printf("\n|");
+                for (int i = 1; i <= colCount; i++) {
+                    String formatStr = "%" + maxValueLengthForShow[i - 1] + "s|";
+                    System.out.printf(formatStr, resultSet.getString(i));
+                }
+            }
+            System.out.println("");
         } catch (SQLException e) {
             System.out.println(e);
         }
     }
 
-    @After
-    public void tearDown() throws Exception {
-        if (connection != null) {
-            connection.close();
+    /**
+     * get all delta objects under a given column
+     */
+    public static void DeltaObject() {
+        try {
+            ResultSet resultSet = databaseMetaData.getColumns("delta", "ln", null, null);
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+            int colCount = resultSetMetaData.getColumnCount();
+            // print header
+            System.out.printf("|");
+            for (int i = 1; i < colCount + 1; i++) {
+                String formatStr = "%" + maxValueLengthForShow[i - 1] + "s|";
+                System.out.printf(formatStr, resultSetMetaData.getColumnName(i));
+            }
+            // print content
+            while (resultSet.next()) {
+                System.out.printf("\n|");
+                for (int i = 1; i <= colCount; i++) {
+                    String formatStr = "%" + maxValueLengthForShow[i - 1] + "s|";
+                    System.out.printf(formatStr, resultSet.getString(i));
+                }
+            }
+            System.out.println("");
+        } catch (SQLException e) {
+            System.out.println(e);
         }
     }
 
-    @Test
+    /**
+     * show timeseries <path>
+     */
+    public static void ShowTimeseriesPath() {
+        try {
+            ResultSet resultSet = databaseMetaData.getColumns("ts", "root", null, null);
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+            int colCount = resultSetMetaData.getColumnCount();
+            // print header
+            System.out.printf("|");
+            for (int i = 1; i < colCount + 1; i++) {
+                String formatStr = "%" + maxValueLengthForShow[i - 1] + "s|";
+                System.out.printf(formatStr, resultSetMetaData.getColumnName(i));
+            }
+            // print content
+            while (resultSet.next()) {
+                System.out.printf("\n|");
+                for (int i = 1; i <= colCount; i++) {
+                    String formatStr = "%" + maxValueLengthForShow[i - 1] + "s|";
+                    System.out.printf(formatStr, resultSet.getString(i));
+                }
+            }
+            System.out.println("");
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
+    /**
+     * show timeseries <path>
+     */
+    public static void ShowTimeseriesPath2() {
+        try {
+            ResultSet resultSet = databaseMetaData.getColumns("ts", "root.ln.wf01.wt01.status", null, null);
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+
+            // print dataType of the given path
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString(TsfileMetadataResultSet.GET_STRING_TIMESERIES_DATATYPE));
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
+    /**
+     * show storage group
+     */
+    public static void ShowStorageGroup() {
+        try {
+            ResultSet resultSet = databaseMetaData.getColumns("sg", null, null, null);
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+            int colCount = resultSetMetaData.getColumnCount();
+            // print header
+            System.out.printf("|");
+            for (int i = 1; i < colCount + 1; i++) {
+                String formatStr = "%" + maxValueLengthForShow[i - 1] + "s|";
+                System.out.printf(formatStr, resultSetMetaData.getColumnName(i));
+            }
+            // print content
+            while (resultSet.next()) {
+                System.out.printf("\n|");
+                for (int i = 1; i <= colCount; i++) {
+                    String formatStr = "%" + maxValueLengthForShow[i - 1] + "s|";
+                    System.out.printf(formatStr, resultSet.getString(i));
+                }
+            }
+            System.out.println("");
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
     /**
      * show metadata in json
      */
-    public void ShowTimeseriesInJson() {
+    public static void ShowTimeseriesInJson() {
         String metadataInJson = null;
         try {
             metadataInJson = databaseMetaData.toString();
@@ -43,68 +170,4 @@ public class MetadataTest {
         }
         System.out.println(metadataInJson);
     }
-
-    @Test
-    /**
-     * show timeseries <path>
-     */
-    public void ShowTimeseriesPath() {
-        try {
-            ResultSet resultSet = ((TsfileDatabaseMetadata) databaseMetaData).getShowTimeseriesPath("root");
-            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-            int colCount = resultSetMetaData.getColumnCount();
-            // print header
-            System.out.printf("|");
-            for(int i=1;i<colCount+1;i++) {
-                String formatStr = "%"+ ((TsfileMetadataResultMetadata) resultSetMetaData).getMaxValueLength(i)+"s|";
-                System.out.printf(formatStr,resultSetMetaData.getColumnName(i));
-            }
-            // print content
-            while (resultSet.next()) {
-                System.out.printf("\n|");
-                for (int i = 1; i <= colCount; i++) {
-                    String formatStr = "%"+ ((TsfileMetadataResultMetadata) resultSetMetaData).getMaxValueLength(i)+"s|";
-                    System.out.printf(formatStr,resultSet.getString(i));
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-    }
-
-    @Test
-    /**
-     * show storage group
-     */
-    public void ShowStorageGroup() {
-        try {
-            ResultSet resultSet = ((TsfileDatabaseMetadata) databaseMetaData).getShowStorageGroups();
-            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-            int colCount = resultSetMetaData.getColumnCount();
-            // print header
-            System.out.printf("|");
-            for(int i=1;i<colCount+1;i++) {
-                String formatStr = "%"+ ((TsfileMetadataResultMetadata) resultSetMetaData).getMaxValueLength(i)+"s|";
-                System.out.printf(formatStr,resultSetMetaData.getColumnName(i));
-            }
-            // print content
-            while(resultSet.next()) {
-                System.out.printf("\n|");
-                for (int i = 1; i <= colCount; i++) {
-                    String formatStr = "%"+ ((TsfileMetadataResultMetadata) resultSetMetaData).getMaxValueLength(i)+"s|";
-                    System.out.printf(formatStr,resultSet.getString(i));
-                }
-            }
-//            while (resultSet.next()) {
-//                StringBuilder builder = new StringBuilder();
-//                for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
-//                    builder.append(resultSet.getString(i)).append(",");
-//                }
-//                System.out.println(builder);
-//            }
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-    }
-
 }

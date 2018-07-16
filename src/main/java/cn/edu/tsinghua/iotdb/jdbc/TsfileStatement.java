@@ -199,12 +199,12 @@ public class TsfileStatement implements Statement {
             } else {
                 String path = cmdSplited[2];
                 TsfileDatabaseMetadata databaseMetaData = (TsfileDatabaseMetadata) connection.getMetaData();
-                resultSet = databaseMetaData.getShowTimeseriesPath(path);
+                resultSet = databaseMetaData.getColumns("ts", path, null, null);
                 return true;
             }
         } else if (sqlToLowerCase.equals(SHOW_STORAGE_GROUP_COMMAND_LOWERCASE)) {
             TsfileDatabaseMetadata databaseMetaData = (TsfileDatabaseMetadata) connection.getMetaData();
-            resultSet = databaseMetaData.getShowStorageGroups();
+            resultSet = databaseMetaData.getColumns("sg", null, null, null);
             return true;
         } else {
             TSExecuteStatementReq execReq = new TSExecuteStatementReq(sessionHandle, sql);

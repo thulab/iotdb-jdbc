@@ -21,25 +21,37 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
     private MetadataType type;
 
-    private String currentStorageGroup;
+    private String currentColumn;
+    public static final String GET_STRING_COLUMN = "COLUMN";
 
-    private static final String GET_STRING_STORAGE_GROUP = "STORAGE_GROUP";
+    private String currentStorageGroup;
+    public static final String GET_STRING_STORAGE_GROUP = "STORAGE_GROUP";
 
     private TSIService.Iface client = null;
     private String STSpath;
     private int batchFetchIdx;
     private boolean emptyResultSet;
     private List<String> currentTimeseries; // current row for show timeseries
-
-    private static final String GET_STRING_TIMESERIES_NAME = "Timeseries";
-    private static final String GET_STRING_TIMESERIES_STORAGE_GROUP = "Storage Group";
-    private static final String GET_STRING_TIMESERIES_DATATYPE = "DataType";
-    private static final String GET_STRING_TIMESERIES_ENCODING = "Encoding";
+    public static final String GET_STRING_TIMESERIES_NAME = "Timeseries";
+    public static final String GET_STRING_TIMESERIES_STORAGE_GROUP = "Storage Group";
+    public static final String GET_STRING_TIMESERIES_DATATYPE = "DataType";
+    public static final String GET_STRING_TIMESERIES_ENCODING = "Encoding";
 
     // for display
     private int colCount; // the number of columns for show
     private String[] showLabels; // headers for show
-    private int[] maxValueLength; // the max length of a column for show
+
+    /**
+     * Constructor used for getColumns(“col”,...) or getColumns(“delta”,...) results
+     *
+     * @param columns
+     */
+    public TsfileMetadataResultSet(List<String> columns) {
+        type = MetadataType.COLUMN;
+        colCount = 1;
+        showLabels = new String[]{"Column"};
+        columnItr = columns.iterator();
+    }
 
     /**
      * Constructor used for SHOW_STORAGE_GROUP results
@@ -49,7 +61,6 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
     public TsfileMetadataResultSet(Set<String> storageGroupSet) {
         type = MetadataType.STORAGE_GROUP;
         colCount = 1;
-        maxValueLength = new int[]{40}; // one fixed column
         showLabels = new String[]{"Storage Group"};
         columnItr = storageGroupSet.iterator();
     }
@@ -61,20 +72,17 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
      */
     public TsfileMetadataResultSet(String path, TSIService.Iface client) {
         type = MetadataType.TIMESERIES;
-        columnItr = null;
+
         this.client = client;
         STSpath = path;
         batchFetchIdx = 0;
         emptyResultSet = false;
 
+        colCount = 4;
         showLabels = new String[]{GET_STRING_TIMESERIES_NAME, GET_STRING_TIMESERIES_STORAGE_GROUP,
                 GET_STRING_TIMESERIES_DATATYPE, GET_STRING_TIMESERIES_ENCODING};
-        colCount = 4;
-        maxValueLength = new int[colCount];
-        maxValueLength[0] = 50;
-        maxValueLength[1] = 40;
-        maxValueLength[2] = 10;
-        maxValueLength[3] = 10;
+
+        columnItr = null;
     }
 
     @Override
@@ -199,7 +207,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return new TsfileMetadataResultMetadata(showLabels, maxValueLength);
+        return new TsfileMetadataResultMetadata(showLabels);
     }
 
     @Override
@@ -235,7 +243,11 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
         } else {
             boolean hasNext = columnItr.hasNext();
             if (hasNext) {
-                currentStorageGroup = (String) columnItr.next();
+                if (type == MetadataType.STORAGE_GROUP) {
+                    currentStorageGroup = (String) columnItr.next();
+                } else if (type == MetadataType.COLUMN) {
+                    currentColumn = (String) columnItr.next();
+                }
             }
             return hasNext;
         }
@@ -279,6 +291,11 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
                     return getString(showLabels[columnIndex - 1]);
                 }
                 break;
+            case COLUMN:
+                if (columnIndex == 1) {
+                    return getString(GET_STRING_COLUMN);
+                }
+                break;
             default:
                 break;
         }
@@ -299,6 +316,8 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
                 return currentTimeseries.get(2);
             case GET_STRING_TIMESERIES_ENCODING:
                 return currentTimeseries.get(3);
+            case GET_STRING_COLUMN:
+                return currentColumn;
             default:
                 break;
         }
@@ -336,6 +355,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
     }
 
     private enum MetadataType {
-        STORAGE_GROUP, TIMESERIES
+        // NOTE: DO NOT CHANGE SEQUENCE OF THE TWO ELEMENTS because @getType() is used in iotdb abstractClient.
+        STORAGE_GROUP, TIMESERIES, COLUMN
     }
 }
