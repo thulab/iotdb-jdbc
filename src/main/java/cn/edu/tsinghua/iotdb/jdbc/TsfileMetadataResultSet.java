@@ -1,6 +1,8 @@
 package cn.edu.tsinghua.iotdb.jdbc;
 
-import cn.edu.tsinghua.iotdb.jdbc.thrift.*;
+import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataReq;
+import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataResp;
+import cn.edu.tsinghua.iotdb.jdbc.thrift.TSIService;
 import org.apache.thrift.TException;
 
 import java.math.BigDecimal;
@@ -10,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +45,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
     private String[] showLabels; // headers for show
 
     /**
-     * Constructor used for getColumns(“col”,...) or getColumns(“delta”,...) results
+     * Constructor used for DatabaseMetadata.getColumns(“col”,...) or getColumns(“delta”,...) results
      *
      * @param columns
      */
@@ -354,7 +357,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
         throw new SQLException("Method not supported");
     }
 
-    private enum MetadataType {
+    private enum MetadataType{
         // NOTE: DO NOT CHANGE SEQUENCE OF THE TWO ELEMENTS because @getType() is used in iotdb abstractClient.
         STORAGE_GROUP, TIMESERIES, COLUMN
     }

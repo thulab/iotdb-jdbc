@@ -179,7 +179,7 @@ public class TsfileStatement implements Statement {
      * (2) show storage group
      * (3) query sql
      * (4) update sql
-     * <p>
+     *
      * (1) and (2) return new TsfileMetadataResultSet
      * (3) return new TsfileQueryResultSet
      * (4) simply get executed
@@ -261,7 +261,7 @@ public class TsfileStatement implements Statement {
         isCancelled = false;
         TSExecuteBatchStatementReq execReq = new TSExecuteBatchStatementReq(sessionHandle, batchSQLList);
         TSExecuteBatchStatementResp execResp = client.executeBatchStatement(execReq);
-        if (execResp.getStatus().statusCode == TS_StatusCode.SUCCESS_STATUS) {
+        if(execResp.getStatus().statusCode ==  TS_StatusCode.SUCCESS_STATUS){
             if (execResp.getResult() == null) {
                 return new int[0];
             } else {
@@ -275,7 +275,7 @@ public class TsfileStatement implements Statement {
             }
         } else {
             BatchUpdateException exception;
-            if (execResp.getResult() == null) {
+            if(execResp.getResult() == null){
                 exception = new BatchUpdateException(execResp.getStatus().errorMessage, new int[0]);
             } else {
                 List<Integer> result = execResp.getResult();
@@ -531,9 +531,9 @@ public class TsfileStatement implements Statement {
         this.sessionHandle = connection.sessionHandle;
     }
 
-    private List<String> getColumnsType(List<String> columns) throws SQLException {
+    private List<String> getColumnsType(List<String> columns) throws SQLException{
         List<String> columnTypes = new ArrayList<>();
-        for (String column : columns) {
+        for(String column : columns) {
             columnTypes.add(getColumnType(column));
         }
         return columnTypes;
