@@ -296,7 +296,7 @@ struct TSFetchMetadataReq{
 		1: required string type
 		2: optional string columnPath
 		3: optional i32 batchFetchIdx
-        4: optional i32 batchFetchSize
+        	4: optional i32 batchFetchSize
 }
 
 
