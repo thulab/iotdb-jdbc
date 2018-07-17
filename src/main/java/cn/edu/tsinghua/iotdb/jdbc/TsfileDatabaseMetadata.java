@@ -51,43 +51,43 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 
 	private ResultSet getColumnsOrDeltaObject(String catalog, String schemaPattern, String columnPattern, String deltaObjectPattern) throws TException, SQLException{
 		TSFetchMetadataReq req;
-        switch (catalog) {
-            case "col":
-                req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_COLUMNS_REQ);
-                req.setColumnPath(schemaPattern);
-                try {
-                    TSFetchMetadataResp resp = client.fetchMetadata(req);
-                    Utils.verifySuccess(resp.getStatus());
-                    return new TsfileMetadataResultSet(resp.getColumnsList());
-                } catch (TException e) {
-                    throw new TException("Conncetion error when fetching column metadata", e);
-                }
-            case "delta":
-                req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_DELTA_OBJECT_REQ);
-                req.setColumnPath(schemaPattern);
-                try {
-                    TSFetchMetadataResp resp = client.fetchMetadata(req);
-                    Utils.verifySuccess(resp.getStatus());
-                    return new TsfileMetadataResultSet(resp.getColumnsList());
-                } catch (TException e) {
-                    throw new TException("Conncetion error when fetching delta object metadata", e);
-                }
-            case "sg":
-                req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_SHOW_STORAGE_GROUP_REQ);
-                try {
-                    TSFetchMetadataResp resp = client.fetchMetadata(req);
-                    Utils.verifySuccess(resp.getStatus());
-                    Set<String> showStorageGroup = resp.getShowStorageGroups();
-                    return new TsfileMetadataResultSet(showStorageGroup);
-                } catch (TException e) {
-                    throw new TException("Conncetion error when fetching storage group metadata", e);
-                }
-            case "ts":
-                ResultSet resultSet = new TsfileMetadataResultSet(schemaPattern, client);
-                return resultSet;
-            default:
-                throw new SQLException(catalog + " is not supported. Please refer to the user guide for more detail.");
-        }
+        	switch (catalog) {
+			case "col":
+				req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_COLUMNS_REQ);
+				req.setColumnPath(schemaPattern);
+				try {
+					TSFetchMetadataResp resp = client.fetchMetadata(req);
+					Utils.verifySuccess(resp.getStatus());
+					return new TsfileMetadataResultSet(resp.getColumnsList());
+				} catch (TException e) {
+					throw new TException("Conncetion error when fetching column metadata", e);
+				}
+			case "delta":
+				req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_DELTA_OBJECT_REQ);
+				req.setColumnPath(schemaPattern);
+				try {
+					TSFetchMetadataResp resp = client.fetchMetadata(req);
+					Utils.verifySuccess(resp.getStatus());
+					return new TsfileMetadataResultSet(resp.getColumnsList());
+				} catch (TException e) {
+					throw new TException("Conncetion error when fetching delta object metadata", e);
+				}
+			case "sg":
+				req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_SHOW_STORAGE_GROUP_REQ);
+				try {
+					TSFetchMetadataResp resp = client.fetchMetadata(req);
+					Utils.verifySuccess(resp.getStatus());
+					Set<String> showStorageGroup = resp.getShowStorageGroups();
+					return new TsfileMetadataResultSet(showStorageGroup);
+				} catch (TException e) {
+					throw new TException("Conncetion error when fetching storage group metadata", e);
+				}
+			case "ts":
+				ResultSet resultSet = new TsfileMetadataResultSet(schemaPattern, client);
+				return resultSet;
+			default:
+				throw new SQLException(catalog + " is not supported. Please refer to the user guide for more detail.");
+        	}
 	}
 
 	@Override
@@ -1148,8 +1148,8 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 	public String toString() {
 		try {
 			return getFullTimeseries();
-        } catch (TsfileSQLException e) {
-            System.out.println(e);
+        	} catch (TsfileSQLException e) {
+            		System.out.println(e);
 		} catch (TException e) {
 			boolean flag = connection.reconnect();
 			this.client = connection.client;
