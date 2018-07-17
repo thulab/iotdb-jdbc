@@ -20,7 +20,7 @@ import java.sql.Types;
            }
        }
        statement.close();
-
+       
     (2)
         ResultSet resultSet = databaseMetaData.getColumns("ts", "root.ln.wf01.wt01", null, null);
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -33,6 +33,7 @@ import java.sql.Types;
             System.out.println(builder);
         }
    */
+
 public class TsfileMetadataResultMetadata implements ResultSetMetaData {
     private String[] showLabels;
 
