@@ -1,5 +1,10 @@
 package cn.edu.tsinghua.iotdb.jdbc;
 
+import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataReq;
+import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataResp;
+import cn.edu.tsinghua.iotdb.jdbc.thrift.TSIService;
+import org.apache.thrift.TException;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSetMetaData;
@@ -7,7 +12,6 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Time;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +23,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	private MetadataType type;
 
-	private ColumnSchema currentColumn;
+	private String currentColumn;
     	public static final String GET_STRING_COLUMN = "COLUMN";
 
 	private String currentStorageGroup;
