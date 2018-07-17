@@ -1,10 +1,5 @@
 package cn.edu.tsinghua.iotdb.jdbc;
 
-import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataReq;
-import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataResp;
-import cn.edu.tsinghua.iotdb.jdbc.thrift.TSIService;
-import org.apache.thrift.TException;
-
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSetMetaData;
@@ -20,26 +15,26 @@ import java.util.Set;
 
 public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
-    private Iterator<?> columnItr;
+	private Iterator<?> columnItr;
 
-    private MetadataType type;
+	private MetadataType type;
 
-    private String currentColumn;
+	private ColumnSchema currentColumn;
     public static final String GET_STRING_COLUMN = "COLUMN";
 
-    private String currentStorageGroup;
+	private String currentStorageGroup;
     public static final String GET_STRING_STORAGE_GROUP = "STORAGE_GROUP";
 
+    private List<String> currentTimeseries; // current row for show timeseries
     private TSIService.Iface client = null;
     private String STSpath;
     private int batchFetchIdx;
     private boolean emptyResultSet;
-    private List<String> currentTimeseries; // current row for show timeseries
     public static final String GET_STRING_TIMESERIES_NAME = "Timeseries";
     public static final String GET_STRING_TIMESERIES_STORAGE_GROUP = "Storage Group";
     public static final String GET_STRING_TIMESERIES_DATATYPE = "DataType";
     public static final String GET_STRING_TIMESERIES_ENCODING = "Encoding";
-
+    
     // for display
     private int colCount; // the number of columns for show
     private String[] showLabels; // headers for show
@@ -55,8 +50,8 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
         showLabels = new String[]{"Column"};
         columnItr = columns.iterator();
     }
-
-    /**
+    
+     /**
      * Constructor used for SHOW_STORAGE_GROUP results
      *
      * @param storageGroupSet
@@ -68,7 +63,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
         columnItr = storageGroupSet.iterator();
     }
 
-    /**
+	/**
      * Constructor used for SHOW_TIMESERIES_PATH results
      *
      * @param path
@@ -88,134 +83,138 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
         columnItr = null;
     }
 
-    @Override
-    public void close() throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public void close() throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public int findColumn(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public int findColumn(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public BigDecimal getBigDecimal(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public BigDecimal getBigDecimal(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public boolean getBoolean(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public boolean getBoolean(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public boolean getBoolean(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public boolean getBoolean(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public byte getByte(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public byte getByte(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public byte getByte(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public byte getByte(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public byte[] getBytes(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public byte[] getBytes(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public byte[] getBytes(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public byte[] getBytes(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public int getConcurrency() throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public int getConcurrency() throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public Date getDate(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public Date getDate(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public Date getDate(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public Date getDate(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public double getDouble(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public double getDouble(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public double getDouble(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public double getDouble(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public int getFetchDirection() throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public int getFetchDirection() throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public float getFloat(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public float getFloat(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public float getFloat(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public float getFloat(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public int getInt(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public int getInt(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public int getInt(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public int getInt(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public long getLong(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public long getLong(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public long getLong(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public long getLong(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public ResultSetMetaData getMetaData() throws SQLException {
-        return new TsfileMetadataResultMetadata(showLabels);
-    }
+	@Override
+	public ResultSetMetaData getMetaData() throws SQLException {
+		if (type == MetadataType.COLUMN) {
+			throw new SQLException("Method not supported for COLUMN type");
+		}
+		return new TsfileMetadataResultMetadata(showLabels);
 
-    @Override
-    public boolean next() throws SQLException {
-        if (type == MetadataType.TIMESERIES) {
+	}
+
+	@Override
+	public boolean next() throws SQLException {
+		if (type == MetadataType.TIMESERIES) {
             if ((columnItr == null || !columnItr.hasNext()) && !emptyResultSet) {
                 TSFetchMetadataReq req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_SHOW_TIMESERIES_REQ);
                 req.setColumnPath(STSpath);
@@ -254,37 +253,37 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
             }
             return hasNext;
         }
-    }
+	}
 
-    @Override
-    public Object getObject(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public Object getObject(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public Object getObject(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public Object getObject(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public short getShort(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public short getShort(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public short getShort(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public short getShort(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public Statement getStatement() throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public Statement getStatement() throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public String getString(int columnIndex) throws SQLException {
-        switch (type) {
-            case STORAGE_GROUP:
+	@Override
+	public String getString(int columnIndex) throws SQLException {
+		switch (type) {
+			case STORAGE_GROUP:
                 if (columnIndex == 1) {
                     return getString(GET_STRING_STORAGE_GROUP);
                 }
@@ -299,17 +298,17 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
                     return getString(GET_STRING_COLUMN);
                 }
                 break;
-            default:
-                break;
-        }
-        throw new SQLException(String.format("select column index %d does not exists", columnIndex));
-    }
+			default:
+				break;  
+		}
+		throw new SQLException(String.format("select column index %d does not exists", columnIndex));
+	}
 
-    @Override
-    public String getString(String columnName) throws SQLException {
-        // use special key word to judge return content
-        switch (columnName) {
-            case GET_STRING_STORAGE_GROUP:
+	@Override
+	public String getString(String columnName) throws SQLException {
+		// use special key word to judge return content
+		switch (columnName) {
+			case GET_STRING_STORAGE_GROUP:
                 return currentStorageGroup;
             case GET_STRING_TIMESERIES_NAME:
                 return currentTimeseries.get(0);
@@ -321,44 +320,44 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
                 return currentTimeseries.get(3);
             case GET_STRING_COLUMN:
                 return currentColumn;
-            default:
-                break;
-        }
-        return null;
-    }
+			default:
+				break;
+		}
+		return null;
+	}
 
-    @Override
-    public Time getTime(int columnIndex) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public Time getTime(int columnIndex) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public Time getTime(String columnName) throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public Time getTime(String columnName) throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public int getType() throws SQLException {
-        return type.ordinal();
-    }
+	@Override
+	public int getType() throws SQLException {
+		return type.ordinal();
+	}
 
-    @Override
-    public SQLWarning getWarnings() throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public SQLWarning getWarnings() throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public boolean isClosed() throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public boolean isClosed() throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    @Override
-    public boolean wasNull() throws SQLException {
-        throw new SQLException("Method not supported");
-    }
+	@Override
+	public boolean wasNull() throws SQLException {
+		throw new SQLException("Method not supported");
+	}
 
-    private enum MetadataType{
-        // NOTE: DO NOT CHANGE SEQUENCE OF THE TWO ELEMENTS because @getType() is used in iotdb abstractClient.
+	private enum MetadataType{
+		// NOTE: DO NOT CHANGE SEQUENCE OF THE TWO ELEMENTS because @getType() is used in iotdb abstractClient.
         STORAGE_GROUP, TIMESERIES, COLUMN
-    }
+	}
 }
