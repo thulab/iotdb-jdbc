@@ -87,12 +87,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>cn.edu.tsinghua</groupId>
-			<artifactId>IoTDB</artifactId>
-			<version>0.7.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>cn.edu.tsinghua</groupId>
 			<artifactId>tsfile</artifactId>
 			<version>0.7.0</version>
 		</dependency>

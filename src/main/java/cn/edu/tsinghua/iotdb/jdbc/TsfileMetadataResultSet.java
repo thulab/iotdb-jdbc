@@ -223,8 +223,8 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
                 		TSFetchMetadataResp resp;
                 		try {
                     			resp = client.fetchMetadata(req);
-                    			Utils.verifySuccess(resp.status);
-                    			if (!resp.hasResultSet) {
+                    			Utils.verifySuccess(resp.getStatus());
+                    			if (!resp.isHasResultSet()) {
                         			emptyResultSet = true;
                         			this.batchFetchIdx = 0;
                         			this.currentTimeseries = null;
