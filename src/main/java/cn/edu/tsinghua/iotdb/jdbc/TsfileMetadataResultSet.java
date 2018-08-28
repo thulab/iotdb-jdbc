@@ -38,7 +38,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
    	public static final String GET_STRING_TIMESERIES_STORAGE_GROUP = "Storage Group";
     	public static final String GET_STRING_TIMESERIES_DATATYPE = "DataType";
     	public static final String GET_STRING_TIMESERIES_ENCODING = "Encoding";
-    
+
     	// for display
     	private int colCount; // the number of columns for show
     	private String[] showLabels; // headers for show
@@ -54,7 +54,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
         	showLabels = new String[]{"Column"};
         	columnItr = columns.iterator();
     	}
-    
+
      	/**
      	* Constructor used for SHOW_STORAGE_GROUP results
      	*
@@ -299,7 +299,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
                 		}
                 		break;
 			default:
-				break;  
+				break;
 		}
 		throw new SQLException(String.format("select column index %d does not exists", columnIndex));
 	}
@@ -356,8 +356,7 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 		throw new SQLException("Method not supported");
 	}
 
-	private enum MetadataType{
-		// NOTE: DO NOT CHANGE SEQUENCE OF THE TWO ELEMENTS because @getType() is used in iotdb abstractClient.
-        	STORAGE_GROUP, TIMESERIES, COLUMN
+	public enum MetadataType{
+    	STORAGE_GROUP, TIMESERIES, COLUMN
 	}
 }

@@ -52,7 +52,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 	private ResultSet getColumnsOrDeltaObject(String catalog, String schemaPattern, String columnPattern, String deltaObjectPattern) throws TException, SQLException{
 		TSFetchMetadataReq req;
         	switch (catalog) {
-			case "col":
+				case TsFileDBConstant.CatalogColumn:
 				req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_COLUMNS_REQ);
 				req.setColumnPath(schemaPattern);
 				try {
@@ -62,7 +62,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 				} catch (TException e) {
 					throw new TException("Conncetion error when fetching column metadata", e);
 				}
-			case "delta":
+			case TsFileDBConstant.CatalogDeltaObject:
 				req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_DELTA_OBJECT_REQ);
 				req.setColumnPath(schemaPattern);
 				try {
@@ -72,7 +72,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 				} catch (TException e) {
 					throw new TException("Conncetion error when fetching delta object metadata", e);
 				}
-			case "sg":
+			case TsFileDBConstant.CatalogStorageGroup:
 				req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_SHOW_STORAGE_GROUP_REQ);
 				try {
 					TSFetchMetadataResp resp = client.fetchMetadata(req);
@@ -82,7 +82,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 				} catch (TException e) {
 					throw new TException("Conncetion error when fetching storage group metadata", e);
 				}
-			case "ts":
+			case TsFileDBConstant.CatalogTimeseries:
 				ResultSet resultSet = new TsfileMetadataResultSet(schemaPattern, client);
 				return resultSet;
 			default:

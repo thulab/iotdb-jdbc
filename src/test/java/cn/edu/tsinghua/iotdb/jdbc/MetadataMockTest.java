@@ -82,7 +82,7 @@ public class MetadataMockTest {
                 "root.vehicle.d0.s1,\n" +
                 "root.vehicle.d0.s2,\n";
         try {
-            ResultSet resultSet = databaseMetaData.getColumns("col", "root", null, null);
+            ResultSet resultSet = databaseMetaData.getColumns(TsFileDBConstant.CatalogColumn, "root", null, null);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             int colCount = resultSetMetaData.getColumnCount();
             StringBuilder resultStr = new StringBuilder();
@@ -116,7 +116,7 @@ public class MetadataMockTest {
         String standard = "Column,\n" +
                 "root.vehicle.d0,\n";
         try {
-            ResultSet resultSet = databaseMetaData.getColumns("delta", "vehicle", null, null);
+            ResultSet resultSet = databaseMetaData.getColumns(TsFileDBConstant.CatalogDeltaObject, "vehicle", null, null);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             int colCount = resultSetMetaData.getColumnCount();
             StringBuilder resultStr = new StringBuilder();
@@ -171,7 +171,7 @@ public class MetadataMockTest {
                 "root.vehicle.d0.s1,root.vehicle,INT64,RLE,\n" +
                 "root.vehicle.d0.s2,root.vehicle,FLOAT,RLE,\n";
         try {
-            ResultSet resultSet = databaseMetaData.getColumns("ts", "root", null, null);
+            ResultSet resultSet = databaseMetaData.getColumns(TsFileDBConstant.CatalogTimeseries, "root", null, null);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             int colCount = resultSetMetaData.getColumnCount();
             StringBuilder resultStr = new StringBuilder();
@@ -211,7 +211,7 @@ public class MetadataMockTest {
         String standard = "DataType,\n" +
                 "INT32,\n";
         try {
-            ResultSet resultSet = databaseMetaData.getColumns("ts", "root.vehicle.d0.s0", null, null);
+            ResultSet resultSet = databaseMetaData.getColumns(TsFileDBConstant.CatalogTimeseries, "root.vehicle.d0.s0", null, null);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             StringBuilder resultStr = new StringBuilder();
             resultStr.append(resultSetMetaData.getColumnName(3)).append(",\n");
@@ -238,7 +238,7 @@ public class MetadataMockTest {
         String standard = "Storage Group,\n" +
                 "root.vehicle,\n";
         try {
-            ResultSet resultSet = databaseMetaData.getColumns("sg", null, null, null);
+            ResultSet resultSet = databaseMetaData.getColumns(TsFileDBConstant.CatalogStorageGroup, null, null, null);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             int colCount = resultSetMetaData.getColumnCount();
             StringBuilder resultStr = new StringBuilder();

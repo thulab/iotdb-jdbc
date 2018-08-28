@@ -14,4 +14,12 @@ public class TsFileDBConstant {
 	public static final String GLOBAL_COLUMNS_REQ = "ALL_COLUMNS";
 
 	public static final String GLOBAL_DELTA_OBJECT_REQ = "DELTA_OBEJECT";
+
+	public static final String CatalogColumn = "col";
+
+	public static final String CatalogDeltaObject = "delta";
+
+	public static final String CatalogStorageGroup = "sg";
+
+	public static final String CatalogTimeseries = "ts";
 }
