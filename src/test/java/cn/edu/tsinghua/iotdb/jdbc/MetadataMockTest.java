@@ -142,7 +142,7 @@ public class MetadataMockTest {
      */
     @SuppressWarnings("resource")
     @Test
-    public void ShowTimeseriesPath() throws Exception {
+    public void ShowTimeseriesPath1() throws Exception {
         List<List<String>> tslist = new ArrayList<>();
         tslist.add(new ArrayList<String>(4) {{
             add("root.vehicle.d0.s0");
