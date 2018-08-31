@@ -12,7 +12,6 @@ import org.apache.thrift.TException;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSIService;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataReq;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataResp;
-import cn.edu.tsinghua.tsfile.file.metadata.enums.TSDataType;
 
 public class TsfileDatabaseMetadata implements DatabaseMetaData {
 	private TsfileConnection connection;
