@@ -24,68 +24,46 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	private MetadataType type;
 
 	private String currentColumn;
-    	public static final String GET_STRING_COLUMN = "COLUMN";
+	public static final String GET_STRING_COLUMN = "COLUMN";
 
 	private String currentStorageGroup;
-    	public static final String GET_STRING_STORAGE_GROUP = "STORAGE_GROUP";
+	public static final String GET_STRING_STORAGE_GROUP = "STORAGE_GROUP";
 
-    	private List<String> currentTimeseries; // current row for show timeseries
-    	private TSIService.Iface client = null;
-    	private String STSpath;
-    	private int batchFetchIdx;
-    	private boolean emptyResultSet;
-    	public static final String GET_STRING_TIMESERIES_NAME = "Timeseries";
+	private List<String> currentTimeseries;
+	public static final String GET_STRING_TIMESERIES_NAME = "Timeseries";
    	public static final String GET_STRING_TIMESERIES_STORAGE_GROUP = "Storage Group";
-    	public static final String GET_STRING_TIMESERIES_DATATYPE = "DataType";
-    	public static final String GET_STRING_TIMESERIES_ENCODING = "Encoding";
+   	public static final String GET_STRING_TIMESERIES_DATATYPE = "DataType";
+   	public static final String GET_STRING_TIMESERIES_ENCODING = "Encoding";
 
     	// for display
     	private int colCount; // the number of columns for show
     	private String[] showLabels; // headers for show
 
     	/**
-     	* Constructor used for DatabaseMetadata.getColumns(“col”,...) or getColumns(“delta”,...) results
-     	*
-     	* @param columns
+     	* Constructor used for the result of DatabaseMetadata.getColumns()
      	*/
-    	public TsfileMetadataResultSet(List<String> columns) {
-        	type = MetadataType.COLUMN;
-        	colCount = 1;
-        	showLabels = new String[]{"Column"};
-        	columnItr = columns.iterator();
-    	}
-
-     	/**
-     	* Constructor used for SHOW_STORAGE_GROUP results
-     	*
-     	* @param storageGroupSet
-     	*/
-    	public TsfileMetadataResultSet(Set<String> storageGroupSet) {
-        	type = MetadataType.STORAGE_GROUP;
-        	colCount = 1;
-        	showLabels = new String[]{"Storage Group"};
-        	columnItr = storageGroupSet.iterator();
-    	}
-
-	/**
-     	* Constructor used for SHOW_TIMESERIES_PATH results
-     	*
-     	* @param path
-     	*/
-    	public TsfileMetadataResultSet(String path, TSIService.Iface client) {
-        	type = MetadataType.TIMESERIES;
-
-        	this.client = client;
-        	STSpath = path;
-        	batchFetchIdx = 0;
-        	emptyResultSet = false;
-
-        	colCount = 4;
-        	showLabels = new String[]{GET_STRING_TIMESERIES_NAME, GET_STRING_TIMESERIES_STORAGE_GROUP,
-                GET_STRING_TIMESERIES_DATATYPE, GET_STRING_TIMESERIES_ENCODING};
-
-        	columnItr = null;
-    	}
+		public TsfileMetadataResultSet(List<String> columns, Set<String> storageGroupSet,
+									   List<List<String>> showTimeseriesList) throws SQLException {
+			if (columns != null) {
+				type = MetadataType.COLUMN;
+				colCount = 1;
+				showLabels = new String[]{"Column"};
+				columnItr = columns.iterator();
+			} else if (storageGroupSet != null) {
+				type = MetadataType.STORAGE_GROUP;
+				colCount = 1;
+				showLabels = new String[]{"Storage Group"};
+				columnItr = storageGroupSet.iterator();
+			} else if (showTimeseriesList != null) {
+				type = MetadataType.TIMESERIES;
+				colCount = 4;
+				showLabels = new String[]{GET_STRING_TIMESERIES_NAME, GET_STRING_TIMESERIES_STORAGE_GROUP,
+						GET_STRING_TIMESERIES_DATATYPE, GET_STRING_TIMESERIES_ENCODING};
+				columnItr = showTimeseriesList.iterator();
+			} else {
+				throw new SQLException("TsfileMetadataResultSet constructor is wrongly used.");
+			}
+		}
 
 	@Override
 	public void close() throws SQLException {
@@ -214,45 +192,17 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	@Override
 	public boolean next() throws SQLException {
-		if (type == MetadataType.TIMESERIES) {
-            		if ((columnItr == null || !columnItr.hasNext()) && !emptyResultSet) {
-                		TSFetchMetadataReq req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_SHOW_TIMESERIES_REQ);
-                		req.setColumnPath(STSpath);
-                		req.setBatchFetchIdx(this.batchFetchIdx);
-                		req.setBatchFetchSize(TsfileJDBCConfig.metaDataBatchFetchSize);
-                		TSFetchMetadataResp resp;
-                		try {
-                    			resp = client.fetchMetadata(req);
-                    			Utils.verifySuccess(resp.getStatus());
-                    			if (!resp.isHasResultSet()) {
-                        			emptyResultSet = true;
-                        			this.batchFetchIdx = 0;
-                        			this.currentTimeseries = null;
-                    			} else {
-                        			List<List<String>> showTsList = resp.getShowTimeseriesList();
-                        			columnItr = showTsList.iterator();
-                        			this.batchFetchIdx += TsfileJDBCConfig.metaDataBatchFetchSize;
-                    			}
-                		} catch (TException e) {
-                    			throw new SQLException("Cannot fetch result from server, because of network connection");
-                		}
-            		}
-            		if (emptyResultSet) {
-                		return false;
-            		}
-            		currentTimeseries = (List<String>) (columnItr.next());
-            		return true;
-        	} else {
-            		boolean hasNext = columnItr.hasNext();
-            		if (hasNext) {
-                		if (type == MetadataType.STORAGE_GROUP) {
-                    			currentStorageGroup = (String) columnItr.next();
-                		} else if (type == MetadataType.COLUMN) {
-                    			currentColumn = (String) columnItr.next();
-                		}
-            		}
-            		return hasNext;
-        	}
+		boolean hasNext = columnItr.hasNext();
+		if (hasNext) {
+			if (type == MetadataType.STORAGE_GROUP) {
+				currentStorageGroup = (String) columnItr.next();
+			} else if (type == MetadataType.COLUMN) {
+				currentColumn = (String) columnItr.next();
+			} else {
+				currentTimeseries = (List<String>) columnItr.next();
+			}
+		}
+		return hasNext;
 	}
 
 	@Override

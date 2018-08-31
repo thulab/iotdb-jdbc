@@ -58,7 +58,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 				try {
 					TSFetchMetadataResp resp = client.fetchMetadata(req);
 					Utils.verifySuccess(resp.getStatus());
-					return new TsfileMetadataResultSet(resp.getColumnsList());
+					return new TsfileMetadataResultSet(resp.getColumnsList(), null, null);
 				} catch (TException e) {
 					throw new TException("Conncetion error when fetching column metadata", e);
 				}
@@ -68,7 +68,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 				try {
 					TSFetchMetadataResp resp = client.fetchMetadata(req);
 					Utils.verifySuccess(resp.getStatus());
-					return new TsfileMetadataResultSet(resp.getColumnsList());
+					return new TsfileMetadataResultSet(resp.getColumnsList(), null, null);
 				} catch (TException e) {
 					throw new TException("Conncetion error when fetching delta object metadata", e);
 				}
@@ -78,13 +78,21 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 					TSFetchMetadataResp resp = client.fetchMetadata(req);
 					Utils.verifySuccess(resp.getStatus());
 					Set<String> showStorageGroup = resp.getShowStorageGroups();
-					return new TsfileMetadataResultSet(showStorageGroup);
+					return new TsfileMetadataResultSet(null, showStorageGroup, null);
 				} catch (TException e) {
 					throw new TException("Conncetion error when fetching storage group metadata", e);
 				}
 			case TsFileDBConstant.CatalogTimeseries:
-				ResultSet resultSet = new TsfileMetadataResultSet(schemaPattern, client);
-				return resultSet;
+				req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_SHOW_TIMESERIES_REQ);
+				req.setColumnPath(schemaPattern);
+				try {
+					TSFetchMetadataResp resp = client.fetchMetadata(req);
+					Utils.verifySuccess(resp.getStatus());
+					List<List<String>> showTimeseriesList= resp.showTimeseriesList;
+					return new TsfileMetadataResultSet(null, null, showTimeseriesList);
+				} catch (TException e) {
+					throw new TException("Conncetion error when fetching timeseries metadata", e);
+				}
 			default:
 				throw new SQLException(catalog + " is not supported. Please refer to the user guide for more detail.");
         	}

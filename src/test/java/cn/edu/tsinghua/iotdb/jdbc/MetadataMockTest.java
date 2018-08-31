@@ -143,28 +143,27 @@ public class MetadataMockTest {
     @SuppressWarnings("resource")
     @Test
     public void ShowTimeseriesPath() throws Exception {
-        List<List<String>> tslist1 = new ArrayList<>();
-        tslist1.add(new ArrayList<String>(4) {{
+        List<List<String>> tslist = new ArrayList<>();
+        tslist.add(new ArrayList<String>(4) {{
             add("root.vehicle.d0.s0");
             add("root.vehicle");
             add("INT32");
             add("RLE");
         }});
-        tslist1.add(new ArrayList<String>(4) {{
+        tslist.add(new ArrayList<String>(4) {{
             add("root.vehicle.d0.s1");
             add("root.vehicle");
             add("INT64");
             add("RLE");
         }});
-        List<List<String>> tslist2 = new ArrayList<>();
-        tslist2.add(new ArrayList<String>(4) {{
+        tslist.add(new ArrayList<String>(4) {{
             add("root.vehicle.d0.s2");
             add("root.vehicle");
             add("FLOAT");
             add("RLE");
         }});
-        when(fetchMetadataResp.isHasResultSet()).thenReturn(true).thenReturn(true).thenReturn(false);
-        when(fetchMetadataResp.getShowTimeseriesList()).thenReturn(tslist1).thenReturn(tslist2);
+
+        when(fetchMetadataResp.getShowTimeseriesList()).thenReturn(tslist);
 
         String standard = "Timeseries,Storage Group,DataType,Encoding,\n" +
                 "root.vehicle.d0.s0,root.vehicle,INT32,RLE,\n" +
@@ -198,15 +197,15 @@ public class MetadataMockTest {
     @SuppressWarnings("resource")
     @Test
     public void ShowTimeseriesPath2() throws Exception {
-        List<List<String>> tslist1 = new ArrayList<>();
-        tslist1.add(new ArrayList<String>(4) {{
+        List<List<String>> tslist = new ArrayList<>();
+        tslist.add(new ArrayList<String>(4) {{
             add("root.vehicle.d0.s0");
             add("root.vehicle");
             add("INT32");
             add("RLE");
         }});
-        when(fetchMetadataResp.isHasResultSet()).thenReturn(true).thenReturn(false);
-        when(fetchMetadataResp.getShowTimeseriesList()).thenReturn(tslist1).thenReturn(tslist1);
+
+        when(fetchMetadataResp.getShowTimeseriesList()).thenReturn(tslist);
 
         String standard = "DataType,\n" +
                 "INT32,\n";
