@@ -1,10 +1,5 @@
 package cn.edu.tsinghua.iotdb.jdbc;
 
-import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataReq;
-import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataResp;
-import cn.edu.tsinghua.iotdb.jdbc.thrift.TSIService;
-import org.apache.thrift.TException;
-
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSetMetaData;

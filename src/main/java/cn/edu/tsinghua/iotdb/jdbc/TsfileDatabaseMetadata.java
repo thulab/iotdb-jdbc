@@ -1156,7 +1156,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 		try {
 			return getFullTimeseries();
         	} catch (TsfileSQLException e) {
-            		System.out.println(e);
+            		System.out.println("Failed to fetch metadata in json because: "+e);
 		} catch (TException e) {
 			boolean flag = connection.reconnect();
 			this.client = connection.client;
