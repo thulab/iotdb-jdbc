@@ -1190,12 +1190,12 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 				try {
 					return getMetadataInJsonFunc();
 				} catch (TException e2) {
-					throw new SQLException("Fail to get metadata in json "
+					throw new SQLException("Failed to fetch all metadata in json "
 							+ "after reconnecting. Please check the server status.");
 				}
 			} else {
-				throw new SQLException("Fail to reconnect to the server "
-						+ "when getting metadata in json. Please check the server status.");
+				throw new SQLException("Failed to reconnect to the server "
+						+ "when fetching all metadata in json. Please check the server status.");
 			}
 		}
 	}
