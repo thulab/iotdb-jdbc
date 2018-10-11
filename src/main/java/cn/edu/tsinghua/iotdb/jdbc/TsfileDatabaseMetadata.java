@@ -26,13 +26,13 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 	public ResultSet getColumns(String catalog, String schemaPattern, String columnPattern, String deltaObjectPattern)
 			throws SQLException {
 		try {
-			return getColumnsOrDeltaObject(catalog, schemaPattern, columnPattern, deltaObjectPattern);
+			return getColumnsFunc(catalog, schemaPattern, columnPattern, deltaObjectPattern);
 		} catch (TException e) {
 			boolean flag = connection.reconnect();
 			this.client = connection.client;
 			if (flag) {
 				try {
-					return getColumnsOrDeltaObject(catalog, schemaPattern, columnPattern, deltaObjectPattern);
+					return getColumnsFunc(catalog, schemaPattern, columnPattern, deltaObjectPattern);
 				} catch (TException e2) {
 					throw new SQLException(String.format(
 							"Fail to get colums catalog=%s, schemaPattern=%s,"
@@ -48,7 +48,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 		}
 	}
 
-	private ResultSet getColumnsOrDeltaObject(String catalog, String schemaPattern, String columnPattern, String deltaObjectPattern) throws TException, SQLException{
+	private ResultSet getColumnsFunc(String catalog, String schemaPattern, String columnPattern, String deltaObjectPattern) throws TException, SQLException{
 		TSFetchMetadataReq req;
         	switch (catalog) {
 				case TsFileDBConstant.CatalogColumn:
@@ -1151,10 +1151,11 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 		throw new SQLException("Method not supported");
 	}
 
+	@Deprecated
 	@Override
 	public String toString() {
 		try {
-			return getFullTimeseries();
+			return getMetadataInJsonFunc();
         	} catch (TsfileSQLException e) {
             		System.out.println("Failed to fetch metadata in json because: "+e);
 		} catch (TException e) {
@@ -1162,7 +1163,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 			this.client = connection.client;
 			if (flag) {
 				try {
-					return getFullTimeseries();
+					return getMetadataInJsonFunc();
 				} catch (TException e2) {
 					System.out.println("Fail to get all timeseries "
 							+ "info after reconnecting. please check server status");
@@ -1175,7 +1176,31 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 		return null;
 	}
 
-	private String getFullTimeseries() throws TException, TsfileSQLException{
+	/*
+	 replace toString() with getMetadataInJson()
+	 */
+	public String getMetadataInJson()
+			throws SQLException {
+		try {
+			return getMetadataInJsonFunc();
+		} catch (TException e) {
+			boolean flag = connection.reconnect();
+			this.client = connection.client;
+			if (flag) {
+				try {
+					return getMetadataInJsonFunc();
+				} catch (TException e2) {
+					throw new SQLException("Fail to get metadata in json "
+							+ "after reconnecting. Please check the server status.");
+				}
+			} else {
+				throw new SQLException("Fail to reconnect to the server "
+						+ "when getting metadata in json. Please check the server status.");
+			}
+		}
+	}
+
+	private String getMetadataInJsonFunc() throws TException, TsfileSQLException{
 		TSFetchMetadataReq req = new TSFetchMetadataReq("METADATA_IN_JSON");
 		TSFetchMetadataResp resp;
 		resp = client.fetchMetadata(req);
