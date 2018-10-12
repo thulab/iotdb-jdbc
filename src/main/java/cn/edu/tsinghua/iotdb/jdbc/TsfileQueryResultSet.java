@@ -6,10 +6,12 @@ import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchResultsReq;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchResultsResp;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSIService;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSOperationHandle;
+import cn.edu.tsinghua.iotdb.jdbc.thrift.TSQueryDataSet;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TS_SessionHandle;
-import cn.edu.tsinghua.tsfile.timeseries.read.query.QueryDataSet;
-import cn.edu.tsinghua.tsfile.timeseries.read.support.Field;
-import cn.edu.tsinghua.tsfile.timeseries.read.support.RowRecord;
+import cn.edu.tsinghua.tsfile.timeseries.read.support.Path;
+import cn.edu.tsinghua.tsfile.timeseries.readV2.datatype.RowRecord;
+import cn.edu.tsinghua.tsfile.timeseries.readV2.datatype.TsPrimitiveType;
+
 import org.apache.thrift.TException;
 
 import java.io.InputStream;
@@ -32,12 +34,8 @@ import java.sql.SQLXML;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class TsfileQueryResultSet implements ResultSet {
 
@@ -59,6 +57,17 @@ public class TsfileQueryResultSet implements ResultSet {
 	private boolean emptyResultSet = false;
 	private String operationType;
 	private final String TIMESTAMP_STR = "Time";
+    private final String LIMIT_STR = "LIMIT";
+    private final String OFFSET_STR = "OFFSET";
+    private final String SLIMIT_STR = "SLIMIT";
+    private final String SOFFSET_STR = "SOFFSET";
+
+    private int rowsCount = 0;
+    private int rowsOffset = -1;
+    private int rowsLimit = -1;
+
+    private int seriesOffset = -1;
+    private int seriesLimit = -1;
 
 	public TsfileQueryResultSet() {
 
@@ -68,26 +77,71 @@ public class TsfileQueryResultSet implements ResultSet {
 								TS_SessionHandle sessionHandle, TSOperationHandle operationHandle, String sql,
 								String aggregations, List<String> columnTypeList)
 			throws SQLException {
-		this.statement = statement;
-		this.sql = sql;
-		this.columnInfoList = new ArrayList<>();
-		this.columnInfoMap = new HashMap<>();
-		this.client = client;
-		this.operationHandle = operationHandle;
-		this.columnInfoList.add(TIMESTAMP_STR);
-		this.columnInfoMap.put(TIMESTAMP_STR, 1);
-		int index = 2;
-		for (String name : columnName) {
-			columnInfoList.add(name);
-			if(!columnInfoMap.containsKey(name)){
-				columnInfoMap.put(name, index++);
-			}
-		}
-		this.maxRows = statement.getMaxRows();
-		this.fetchSize = statement.getFetchSize();
-		this.operationHandle = operationHandle;
-		this.operationType = aggregations;
-		this.columnTypeList = columnTypeList;
+
+        // first try to retrieve limit&offset&slimit&soffset parameters from sql
+        String[] splited = sql.toUpperCase().split("\\s+");
+        List<String> arraySplited = Arrays.asList(splited);
+        try {
+            int posLimit = arraySplited.indexOf(LIMIT_STR);
+            if (posLimit != -1) {
+                rowsLimit = Integer.parseInt(splited[posLimit + 1]);
+                int posOffset = arraySplited.indexOf(OFFSET_STR);
+                if (posOffset != -1) {
+                    rowsOffset = Integer.parseInt(splited[posOffset + 1]);
+                }
+            }
+            int posSLimit = arraySplited.indexOf(SLIMIT_STR);
+            if (posSLimit != -1) {
+                seriesLimit = Integer.parseInt(splited[posSLimit + 1]);
+                int posSOffset = arraySplited.indexOf(SOFFSET_STR);
+                if (posSOffset != -1) {
+                    seriesOffset = Integer.parseInt(splited[posSOffset + 1]);
+                }
+            }
+        } catch (NumberFormatException e) {
+            throw new TsfileSQLException("Out of range: LIMIT&SLIMIT parameter data type should be Int32.");
+        }
+
+        this.sql = sql;
+        this.statement = statement;
+        this.maxRows = statement.getMaxRows();
+        this.fetchSize = statement.getFetchSize();
+        this.client = client;
+        this.operationHandle = operationHandle;
+        this.operationType = aggregations;
+        this.columnInfoList = new ArrayList<>();
+        this.columnInfoMap = new HashMap<>();
+        this.columnTypeList = new ArrayList<>();
+
+        this.columnInfoList.add(TIMESTAMP_STR);
+        this.columnInfoMap.put(TIMESTAMP_STR, 1);
+        int index = 2;
+        int colCount = columnName.size();
+
+        if (seriesLimit == -1) { // if slimit is unset
+            seriesLimit = colCount;
+            seriesOffset = 0;
+        } else if (seriesOffset == -1) {// if slimit is set and soffset is unset
+            seriesOffset = 0;
+        } else if (seriesOffset >= colCount) { // if slimit and soffset are set, but soffset exceeds the upper boundary 'colCount'-1
+            // assign 0 to seriesLimit so next() will return 'false' instantly without needing to fetch data
+            // and the 'FOR' loop below will be skipped because seriesOffset equals 'seriesEnd' then.
+            seriesLimit = 0;
+        }
+        // else slimit and soffset are set and soffset is less than 'colCount',
+        // so there is no need to modify slimit or soffset.
+
+        // assign columnInfoList, columnInfoMap and columnTypeList
+        int seriesEnd = seriesOffset + seriesLimit;
+        for (int i = seriesOffset; i < colCount && i < seriesEnd; i++) {
+            String name = columnName.get(i);
+            columnInfoList.add(name);
+            if (!columnInfoMap.containsKey(name)) {
+                columnInfoMap.put(name, index++);
+            }
+            this.columnTypeList.add(columnTypeList.get(i));
+        }
+
 	}
 
 	@Override
@@ -610,8 +664,8 @@ public class TsfileQueryResultSet implements ResultSet {
 		throw new SQLException("Method not supported");
 	}
 
-	@Override
-	public boolean next() throws SQLException {
+    // the next record rule without considering the LIMIT&SLIMIT constraints
+    private boolean nextWithoutLimit() throws SQLException {
 		if (maxRows > 0 && rowsFetched >= maxRows) {
 			System.out.println("Reach max rows " + maxRows);
 			return false;
@@ -619,26 +673,22 @@ public class TsfileQueryResultSet implements ResultSet {
 
 		if ((recordItr == null || !recordItr.hasNext()) && !emptyResultSet) {
 			TSFetchResultsReq req = new TSFetchResultsReq(sql, fetchSize);
-			
+
 			try {
 				TSFetchResultsResp resp = client.fetchResults(req);
 				Utils.verifySuccess(resp.status);
 				if (!resp.hasResultSet) {
 					emptyResultSet = true;
 				} else {
-					QueryDataSet queryDataSet = Utils.convertQueryDataSet(resp.getQueryDataSet());
-					List<RowRecord> records = new ArrayList<>();
-					while (queryDataSet.hasNextRecord()) {
-						RowRecord rowRecord = queryDataSet.getNextRecord();
-						records.add(rowRecord);
-					}
+					TSQueryDataSet tsQueryDataSet = resp.getQueryDataSet();
+					List<RowRecord> records = Utils.convertRowRecords(tsQueryDataSet);
 					recordItr = records.iterator();
 				}
 			} catch (TException e) {
 				throw new SQLException("Cannot fetch result from server, because of network connection");
 			}
-		}
 
+		}
 		if (emptyResultSet) {
 			return false;
 		}
@@ -649,9 +699,43 @@ public class TsfileQueryResultSet implements ResultSet {
 		// columnInfo.remove(TIMESTAMP_STR);
 		// }
 		// }
+
 		rowsFetched++;
+        // maxRows is a constraint that exists in parallel with the LIMIT&SLIMIT constraints,
+        // so rowsFetched will increase whenever the row is fetched,
+        // regardless of whether the row satisfies the LIMIT&SLIMIT constraints or not.
+
 		return true;
 	}
+
+	@Override
+    // the next record rule with the LIMIT&SLIMIT constraints added
+	public boolean next() throws SQLException {
+        if (rowsLimit == 0 || seriesLimit == 0) {
+            return false;// indicating immediately that there is no next record
+        }
+
+        if (rowsLimit != -1) { // if LIMIT is set
+            if (rowsOffset != -1) { // if OFFSET is set and the initial offset move has not been done yet
+                for (int i = 0; i < rowsOffset; i++) { // try to move to the the next record position where OFFSET indicates
+                    if (!nextWithoutLimit()) {
+                        return false;// cannot move to the next record position where OFFSET indicates
+                    }
+                }
+                rowsOffset = -1; // indicating that the initial offset move has been finished
+            }
+
+            if (rowsCount >= rowsLimit) { // if the LIMIT constraint is met
+                return false;
+            }
+        }
+
+		boolean isNext = nextWithoutLimit();
+		if (isNext && rowsLimit != -1) {
+			rowsCount++;
+		}
+		return isNext;
+}
 
 	@Override
 	public boolean previous() throws SQLException {
@@ -1119,7 +1203,7 @@ public class TsfileQueryResultSet implements ResultSet {
 			throw new SQLException("No record remains");
 		}
 	}
-	
+
 	private String findColumnNameByIndex(int columnIndex) throws SQLException{
 		if(columnIndex <= 0) {
 			throw new SQLException(String.format("column index should start from 1"));
@@ -1133,11 +1217,20 @@ public class TsfileQueryResultSet implements ResultSet {
 	private String getValueByName(String columnName) throws SQLException {
 		checkRecord();
 		if (columnName.equals(TIMESTAMP_STR)) {
-			return String.valueOf(record.getTime());
+			return String.valueOf(record.getTimestamp());
 		}
-		int tmp = columnInfoMap.get(columnName);
-		Field field = record.fields.get(tmp - 2);
-		if(field == null || field.getStringValue() == null) return null;
-		return field.getStringValue();
+		int tmp = columnInfoMap.get(columnName)+seriesOffset;
+		int i = 0;
+		for(Entry<Path, TsPrimitiveType> entry : record.getFields().entrySet()){
+			i++;
+			if(i == tmp-1){
+				if(entry.getValue() != null){
+					return entry.getValue().getStringValue();
+				} else {
+					return null;
+				}
+			}
+		}
+		return null;
 	}
 }

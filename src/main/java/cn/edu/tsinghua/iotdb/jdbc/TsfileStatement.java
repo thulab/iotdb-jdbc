@@ -13,9 +13,11 @@ import cn.edu.tsinghua.iotdb.jdbc.thrift.TSFetchMetadataResp;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSIService;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSOperationHandle;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TS_SessionHandle;
+import cn.edu.tsinghua.iotdb.jdbc.thrift.TS_StatusCode;
 
 import org.apache.thrift.TException;
 
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,7 +36,8 @@ public class TsfileStatement implements Statement {
 	private TS_SessionHandle sessionHandle = null;
 	private TSOperationHandle operationHandle = null;
 	private List<String> batchSQLList;
-
+	private static final String SHOW_TIMESERIES_COMMAND_LOWERCASE = "show timeseries";
+	private static final String SHOW_STORAGE_GROUP_COMMAND_LOWERCASE = "show storage group";
 	/**
 	 * Keep state so we can fail certain calls made after close().
 	 */
@@ -169,18 +172,52 @@ public class TsfileStatement implements Statement {
 		}
 	}
 
+
+	/**
+	 * There are four kinds of sql here:
+	 * (1) show timeseries path
+	 * (2) show storage group
+	 * (3) query sql
+	 * (4) update sql
+	 *
+	 * (1) and (2) return new TsfileMetadataResultSet
+	 * (3) return new TsfileQueryResultSet
+	 * (4) simply get executed
+	 *
+	 * @param sql
+	 * @return
+	 * @throws TException
+	 * @throws SQLException
+	 */
 	private boolean executeSQL(String sql) throws TException, SQLException {
 		isCancelled = false;
-		TSExecuteStatementReq execReq = new TSExecuteStatementReq(sessionHandle, sql);
-		TSExecuteStatementResp execResp = client.executeStatement(execReq);
-		operationHandle = execResp.getOperationHandle();
-		Utils.verifySuccess(execResp.getStatus());
-		if (execResp.getOperationHandle().hasResultSet) {
-			resultSet = new TsfileQueryResultSet(this, execResp.getColumns(), client, sessionHandle, 
-					operationHandle, sql, execResp.getOperationType(), getColumnsType(execResp.getColumns()));
+		String sqlToLowerCase = sql.toLowerCase().trim();
+		if (sqlToLowerCase.startsWith(SHOW_TIMESERIES_COMMAND_LOWERCASE)) {
+			String[] cmdSplited = sqlToLowerCase.split("\\s+");
+			if (cmdSplited.length != 3) {
+				throw new SQLException("Error format of \'SHOW TIMESERIES <PATH>\'");
+			} else {
+				String path = cmdSplited[2];
+				TsfileDatabaseMetadata databaseMetaData = (TsfileDatabaseMetadata) connection.getMetaData();
+				resultSet = databaseMetaData.getShowTimeseries(path);
+				return true;
+			}
+		} else if (sqlToLowerCase.equals(SHOW_STORAGE_GROUP_COMMAND_LOWERCASE)) {
+			TsfileDatabaseMetadata databaseMetaData = (TsfileDatabaseMetadata) connection.getMetaData();
+			resultSet = databaseMetaData.getShowStorageGroups();
 			return true;
+		} else {
+			TSExecuteStatementReq execReq = new TSExecuteStatementReq(sessionHandle, sql);
+			TSExecuteStatementResp execResp = client.executeStatement(execReq);
+			operationHandle = execResp.getOperationHandle();
+			Utils.verifySuccess(execResp.getStatus());
+			if (execResp.getOperationHandle().hasResultSet) {
+				resultSet = new TsfileQueryResultSet(this, execResp.getColumns(), client, sessionHandle,
+						operationHandle, sql, execResp.getOperationType(), getColumnsType(execResp.getColumns()));
+				return true;
+			}
+			return false;
 		}
-		return false;
 	}
 
 	@Override
@@ -220,21 +257,36 @@ public class TsfileStatement implements Statement {
 		}
 	}
 
-	private int[] executeBatchSQL() throws TException, TsfileSQLException {
+	private int[] executeBatchSQL() throws TException, SQLException {
 		isCancelled = false;
 		TSExecuteBatchStatementReq execReq = new TSExecuteBatchStatementReq(sessionHandle, batchSQLList);
 		TSExecuteBatchStatementResp execResp = client.executeBatchStatement(execReq);
-		Utils.verifySuccess(execResp.getStatus());
-		if (execResp.getResult() == null) {
-			return new int[0];
-		} else {
-			List<Integer> result = execResp.getResult();
-			int len = result.size();
-			int[] updateArray = new int[len];
-			for (int i = 0; i < len; i++) {
-				updateArray[i] = result.get(i);
+		if(execResp.getStatus().statusCode ==  TS_StatusCode.SUCCESS_STATUS){
+			if (execResp.getResult() == null) {
+				return new int[0];
+			} else {
+				List<Integer> result = execResp.getResult();
+				int len = result.size();
+				int[] updateArray = new int[len];
+				for (int i = 0; i < len; i++) {
+					updateArray[i] = result.get(i);
+				}
+				return updateArray;
 			}
-			return updateArray;
+		} else {
+			BatchUpdateException exception;
+			if(execResp.getResult() == null){
+				exception = new BatchUpdateException(execResp.getStatus().errorMessage, new int[0]);
+			} else {
+				List<Integer> result = execResp.getResult();
+				int len = result.size();
+				int[] updateArray = new int[len];
+				for (int i = 0; i < len; i++) {
+					updateArray[i] = result.get(i);
+				}
+				exception = new BatchUpdateException(execResp.getStatus().errorMessage, updateArray);
+			}
+			throw exception;
 		}
 	}
 
@@ -490,7 +542,7 @@ public class TsfileStatement implements Statement {
 	private String getColumnType(String columnName) throws SQLException {
 		TSFetchMetadataReq req;
 		
-		req = new TSFetchMetadataReq("COLUMN");
+		req = new TSFetchMetadataReq(TsFileDBConstant.GLOBAL_COLUMN_REQ);
 		req.setColumnPath(columnName);
 
 		TSFetchMetadataResp resp;
