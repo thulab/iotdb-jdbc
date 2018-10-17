@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  * CREATE TIMESERIES root.vehicle.d0.s2 WITH DATATYPE=FLOAT, ENCODING=RLE;
  */
 
-public class MetadataMockTest {
+public class TsfileDatabaseMetadataTest {
     @Mock
     private TsfileConnection connection;
 

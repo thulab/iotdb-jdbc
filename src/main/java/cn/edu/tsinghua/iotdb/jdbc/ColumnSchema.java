@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class ColumnSchema implements Serializable {
 	private static final long serialVersionUID = -8257474930341487207L;
-
+	// column name
 	public String name;
 	public TSDataType dataType;
 	public TSEncoding encoding;
