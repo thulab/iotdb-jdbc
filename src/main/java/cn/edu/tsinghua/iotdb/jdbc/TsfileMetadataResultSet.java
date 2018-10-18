@@ -22,7 +22,8 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 	public static final String GET_STRING_COLUMN = "COLUMN";
 
 	private String currentStorageGroup;
-	public static final String GET_STRING_STORAGE_GROUP = "STORAGE_GROUP";
+	// NOTE: 'GET_STRING_STORAGE_GROUP' must not equal 'GET_STRING_TIMESERIES_STORAGE_GROUP'
+	public static final String GET_STRING_STORAGE_GROUP = "STORAGE GROUP";
 
 	private List<String> currentTimeseries;
 	public static final String GET_STRING_TIMESERIES_NAME = "Timeseries";
@@ -41,19 +42,19 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 									   List<List<String>> showTimeseriesList) throws SQLException {
 			if (columns != null) {
 				type = MetadataType.COLUMN;
+				showLabels = new String[]{GET_STRING_COLUMN};
 				colCount = 1;
-				showLabels = new String[]{"Column"};
 				columnItr = columns.iterator();
 			} else if (storageGroupSet != null) {
 				type = MetadataType.STORAGE_GROUP;
+				showLabels = new String[]{GET_STRING_STORAGE_GROUP};
 				colCount = 1;
-				showLabels = new String[]{"Storage Group"};
 				columnItr = storageGroupSet.iterator();
 			} else if (showTimeseriesList != null) {
 				type = MetadataType.TIMESERIES;
-				colCount = 4;
 				showLabels = new String[]{GET_STRING_TIMESERIES_NAME, GET_STRING_TIMESERIES_STORAGE_GROUP,
 						GET_STRING_TIMESERIES_DATATYPE, GET_STRING_TIMESERIES_ENCODING};
+				colCount = 4;
 				columnItr = showTimeseriesList.iterator();
 			} else {
 				throw new SQLException("TsfileMetadataResultSet constructor is wrongly used.");
@@ -227,24 +228,8 @@ public class TsfileMetadataResultSet extends TsfileQueryResultSet {
 
 	@Override
 	public String getString(int columnIndex) throws SQLException {
-		switch (type) {
-			case STORAGE_GROUP:
-                		if (columnIndex == 1) {
-                    			return getString(GET_STRING_STORAGE_GROUP);
-                		}
-                		break;
-            		case TIMESERIES:
-                		if (columnIndex >= 1 && columnIndex <= colCount) {
-                    			return getString(showLabels[columnIndex - 1]);
-                		}
-                		break;
-            		case COLUMN:
-                		if (columnIndex == 1) {
-                    			return getString(GET_STRING_COLUMN);
-                		}
-                		break;
-			default:
-				break;
+		if (columnIndex >= 1 && columnIndex <= colCount) {
+			return getString(showLabels[columnIndex - 1]);
 		}
 		throw new SQLException(String.format("select column index %d does not exists", columnIndex));
 	}

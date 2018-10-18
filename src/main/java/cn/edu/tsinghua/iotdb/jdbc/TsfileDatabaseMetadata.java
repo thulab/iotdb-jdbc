@@ -1153,6 +1153,9 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 
 	@Deprecated
 	@Override
+	/*
+	  recommend using getMetadataInJson() instead of toString()
+	 */
 	public String toString() {
 		try {
 			return getMetadataInJsonFunc();
@@ -1177,7 +1180,7 @@ public class TsfileDatabaseMetadata implements DatabaseMetaData {
 	}
 
 	/*
-	 replace toString() with getMetadataInJson()
+	  recommend using getMetadataInJson() instead of toString()
 	 */
 	public String getMetadataInJson()
 			throws SQLException {
