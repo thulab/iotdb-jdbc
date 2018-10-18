@@ -1,8 +1,6 @@
 package cn.edu.tsinghua.iotdb.jdbc;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 
@@ -15,8 +13,6 @@ import org.mockito.MockitoAnnotations;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TS_SessionHandle;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TSIService.Iface;
 
-
-
 public class TsfileStatementTest {
 	@Mock
 	private TsfileConnection connection;
@@ -27,13 +23,10 @@ public class TsfileStatementTest {
 	@Mock
 	private TS_SessionHandle sessHandle;
 	
-
-	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 	}
-
 
 	@After
 	public void tearDown() throws Exception {
@@ -56,13 +49,20 @@ public class TsfileStatementTest {
 	    assertEquals(initial, stmt.getFetchSize());
 	}
 	
+	@Test
+	public void testSetFetchSize3() throws SQLException {
+		final int fetchSize = 10000;
+		TsfileStatement stmt = new TsfileStatement(connection, client, sessHandle, fetchSize);
+	    assertEquals(fetchSize, stmt.getFetchSize());
+	}
+
 	@SuppressWarnings("resource")
 	@Test(expected = SQLException.class)
-	public void testSetFetchSize3() throws SQLException {
+	public void testSetFetchSize4() throws SQLException {
 		TsfileStatement stmt = new TsfileStatement(connection, client, sessHandle);
 	    stmt.setFetchSize(-1);
 	}
-	
+
 	@SuppressWarnings("resource")
 	@Test
 	public void testSetMaxRows1() throws SQLException {
