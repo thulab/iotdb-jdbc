@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
  * (4) show storage group
  * databaseMetaData.getColumns(“sg”, null, null, null);
  * (5) show metadata in json
- * databaseMetaData.toString()
+ * ((TsfileDatabaseMetadata)databaseMetaData).getMetadataInJson()
  * <p>
  * The tests utilize the mockito framework to mock responses from an IoTDB server.
  * The IoTDB server status mocked here is determined by the following four sql commands:
