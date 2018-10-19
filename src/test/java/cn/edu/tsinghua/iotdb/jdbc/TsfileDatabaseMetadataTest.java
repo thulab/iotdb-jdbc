@@ -77,7 +77,7 @@ public class TsfileDatabaseMetadataTest {
 
         when(fetchMetadataResp.getColumnsList()).thenReturn(columnList);
 
-        String standard = "Column,\n" +
+        String standard = "COLUMN,\n" +
                 "root.vehicle.d0.s0,\n" +
                 "root.vehicle.d0.s1,\n" +
                 "root.vehicle.d0.s2,\n";
@@ -113,7 +113,7 @@ public class TsfileDatabaseMetadataTest {
 
         when(fetchMetadataResp.getColumnsList()).thenReturn(columnList);
 
-        String standard = "Column,\n" +
+        String standard = "COLUMN,\n" +
                 "root.vehicle.d0,\n";
         try {
             ResultSet resultSet = databaseMetaData.getColumns(TsFileDBConstant.CatalogDeltaObject, "vehicle", null, null);
@@ -234,7 +234,7 @@ public class TsfileDatabaseMetadataTest {
         sgSet.add("root.vehicle");
         when(fetchMetadataResp.getShowStorageGroups()).thenReturn(sgSet);
 
-        String standard = "Storage Group,\n" +
+        String standard = "STORAGE GROUP,\n" +
                 "root.vehicle,\n";
         try {
             ResultSet resultSet = databaseMetaData.getColumns(TsFileDBConstant.CatalogStorageGroup, null, null, null);
