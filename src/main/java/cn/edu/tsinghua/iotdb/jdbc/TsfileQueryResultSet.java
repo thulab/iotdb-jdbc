@@ -59,8 +59,14 @@ public class TsfileQueryResultSet implements ResultSet {
 	private final String TIMESTAMP_STR = "Time";
     private final String LIMIT_STR = "LIMIT";
     private final String OFFSET_STR = "OFFSET";
-    private int rowsOffset = 0; // 0 means it is not constrained, or the offset position has been reached
-	private boolean isLimit = false;
+	private int rowsLimit = 0; // 0 means it is not constrained
+	private int rowsOffset = 0; // 0 means it is not constrained, or the offset position has been reached
+
+	/*
+	  Combine maxRows and the LIMIT constraints.
+	  0 means that both maxRows and LIMIT are not constrained.
+	 */
+	private int maxRowsOrRowsLimit;
 
 	public TsfileQueryResultSet() {
 
@@ -91,29 +97,29 @@ public class TsfileQueryResultSet implements ResultSet {
 			}
 		}
 
+		maxRowsOrRowsLimit = maxRows;
+
 		// parse the LIMIT&OFFSET parameters from sql
 		String[] splited = sql.toUpperCase().split("\\s+");
 		List<String> arraySplited = Arrays.asList(splited);
 		try {
 			int posLimit = arraySplited.indexOf(LIMIT_STR);
 			if (posLimit != -1) {
-				int rowsLimit = Integer.parseInt(splited[posLimit + 1]);
-				isLimit = true;
+				rowsLimit = Integer.parseInt(splited[posLimit + 1]);
 
-				// NOTE that in TsfileStatement maxRows=0 means it is not constrained
-				// NOTE that rowsLimit is ensured to be a positive integer by the server side
+				// NOTE that maxRows=0 in TsfileStatement means it is not constrained
+				// NOTE that LIMIT <N>: N is ensured to be a positive integer by the server side
 				if (maxRows == 0) {
-					maxRows = rowsLimit;
+					maxRowsOrRowsLimit = rowsLimit;
 				} else {
-					maxRows = (rowsLimit < maxRows) ? rowsLimit : maxRows;
+					maxRowsOrRowsLimit = (rowsLimit < maxRows) ? rowsLimit : maxRows;
 				}
-				// NOTE that now maxRows=0 means both original maxRows and LIMIT is not constrained
 
 				// check if OFFSET is constrained after LIMIT has been constrained
 				int posOffset = arraySplited.indexOf(OFFSET_STR);
 				if (posOffset != -1) {
+					// NOTE that OFFSET <OFFSETValue>: OFFSETValue is ensured to be a non-negative integer by the server side
 					rowsOffset = Integer.parseInt(splited[posOffset + 1]);
-					// NOTE that rowsOffset is ensured to be a non-negative integer by the server side
 				}
 			}
 		} catch (NumberFormatException e) {
@@ -672,10 +678,10 @@ public class TsfileQueryResultSet implements ResultSet {
 	@Override
     // the next record rule considering both the maxRows constraint and the LIMIT&OFFSET constraint
 	public boolean next() throws SQLException {
-		// maxRows > 0 indicates that the original maxRows (as defined in TsfileStatement) or LIMIT is constrained
-		if (maxRows > 0 && rowsFetched >= maxRows) {
-			if (!isLimit) {
-				// then the original maxRows (as defined in TsfileStatement) is embodied
+		// maxRowsOrRowsLimit > 0 indicates that maxRows (as defined in TsfileStatement) or LIMIT is constrained
+		if (maxRowsOrRowsLimit > 0 && rowsFetched >= maxRowsOrRowsLimit) {
+			if (rowsLimit == 0 || (maxRows > 0 && maxRows < rowsLimit)) {
+				// then the constraint of maxRows is embodied
 				System.out.println("Reach max rows " + maxRows);
 			}
 			return false;
