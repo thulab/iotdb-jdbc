@@ -60,6 +60,7 @@ public class TsfileQueryResultSet implements ResultSet {
     private final String LIMIT_STR = "LIMIT";
     private final String OFFSET_STR = "OFFSET";
     private int rowsOffset = 0; // 0 means it is not constrained, or the offset position has been reached
+	private boolean isLimit = false;
 
 	public TsfileQueryResultSet() {
 
@@ -97,21 +98,22 @@ public class TsfileQueryResultSet implements ResultSet {
 			int posLimit = arraySplited.indexOf(LIMIT_STR);
 			if (posLimit != -1) {
 				int rowsLimit = Integer.parseInt(splited[posLimit + 1]);
+				isLimit = true;
 
-				// in TsfileStatement maxRows=0 means it is not constrained
+				// NOTE that in TsfileStatement maxRows=0 means it is not constrained
+				// NOTE that rowsLimit is ensured to be a positive integer by the server side
 				if (maxRows == 0) {
 					maxRows = rowsLimit;
 				} else {
 					maxRows = (rowsLimit < maxRows) ? rowsLimit : maxRows;
 				}
-				// NOTE rowsLimit is ensured to be a positive integer
-				// NOTE now maxRows=0 means both original maxRows and LIMIT is not constrained
+				// NOTE that now maxRows=0 means both original maxRows and LIMIT is not constrained
 
-				// OFFSET can only be defined after LIMIT is defined
+				// check if OFFSET is constrained after LIMIT has been constrained
 				int posOffset = arraySplited.indexOf(OFFSET_STR);
 				if (posOffset != -1) {
 					rowsOffset = Integer.parseInt(splited[posOffset + 1]);
-					// NOTE rowsOffset is ensured to be a non-negative integer
+					// NOTE that rowsOffset is ensured to be a non-negative integer by the server side
 				}
 			}
 		} catch (NumberFormatException e) {
@@ -670,9 +672,12 @@ public class TsfileQueryResultSet implements ResultSet {
 	@Override
     // the next record rule considering both the maxRows constraint and the LIMIT&OFFSET constraint
 	public boolean next() throws SQLException {
-		// NOTE here maxRows=0 means both original maxRows (as defined in TsfileStatement and LIMIT is not constrained
+		// maxRows > 0 indicates that the original maxRows (as defined in TsfileStatement) or LIMIT is constrained
 		if (maxRows > 0 && rowsFetched >= maxRows) {
-			System.out.println("Reach max rows " + maxRows);
+			if (!isLimit) {
+				// then the original maxRows (as defined in TsfileStatement) is embodied
+				System.out.println("Reach max rows " + maxRows);
+			}
 			return false;
 		}
 
