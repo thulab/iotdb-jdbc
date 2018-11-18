@@ -59,9 +59,7 @@ public class TsfileQueryResultSet implements ResultSet {
 	private final String TIMESTAMP_STR = "Time";
     private final String LIMIT_STR = "LIMIT";
     private final String OFFSET_STR = "OFFSET";
-
-    private int rowsOffset = -1;
-    private int rowsLimit = -1;
+    private int rowsOffset = 0; // 0 means it is not constrained, or the offset position has been reached
 
 	public TsfileQueryResultSet() {
 
@@ -98,10 +96,22 @@ public class TsfileQueryResultSet implements ResultSet {
 		try {
 			int posLimit = arraySplited.indexOf(LIMIT_STR);
 			if (posLimit != -1) {
-				rowsLimit = Integer.parseInt(splited[posLimit + 1]);
+				int rowsLimit = Integer.parseInt(splited[posLimit + 1]);
+
+				// in TsfileStatement maxRows=0 means it is not constrained
+				if (maxRows == 0) {
+					maxRows = rowsLimit;
+				} else {
+					maxRows = (rowsLimit < maxRows) ? rowsLimit : maxRows;
+				}
+				// NOTE rowsLimit is ensured to be a positive integer
+				// NOTE now maxRows=0 means both original maxRows and LIMIT is not constrained
+
+				// OFFSET can only be defined after LIMIT is defined
 				int posOffset = arraySplited.indexOf(OFFSET_STR);
 				if (posOffset != -1) {
 					rowsOffset = Integer.parseInt(splited[posOffset + 1]);
+					// NOTE rowsOffset is ensured to be a non-negative integer
 				}
 			}
 		} catch (NumberFormatException e) {
@@ -660,35 +670,27 @@ public class TsfileQueryResultSet implements ResultSet {
 	@Override
     // the next record rule considering both the maxRows constraint and the LIMIT&OFFSET constraint
 	public boolean next() throws SQLException {
+		// NOTE here maxRows=0 means both original maxRows (as defined in TsfileStatement and LIMIT is not constrained
 		if (maxRows > 0 && rowsFetched >= maxRows) {
 			System.out.println("Reach max rows " + maxRows);
 			return false;
 		}
 
-		// when LIMIT is set
-        if (rowsLimit != -1) {
-
-			// if the initial OFFSET move has finished && rowsFetched exceeds the upper boundary set by LIMIT
-			if (rowsOffset == -1 && rowsFetched >= rowsLimit) {
-				return false;
+		// when rowsOffset is constrained and the offset position has NOT been reached
+		if (rowsOffset != 0) {
+			// try to move to the offset position
+			for (int i = 0; i < rowsOffset; i++) {
+				if (!nextWithoutConstraints()) {
+					return false; // no next record, i.e, fail to move to the offset position
+				}
 			}
-
-			// if the initial OFFSET move has not finished yet
-            if (rowsOffset != -1) {
-				// try to move to the the position where OFFSET indicates
-                for (int i = 0; i < rowsOffset; i++) {
-                    if (!nextWithoutConstraints()) {
-                        return false; // fail to move to the position where OFFSET indicates
-                    }
-                }
-                rowsOffset = -1; // the initial OFFSET move has finished
-            }
-        }
+			rowsOffset = 0; // the offset position has been reached
+		}
 
 		boolean isNext = nextWithoutConstraints();
 
-		// Note that 'rowsFetched' do not get added in the nextWithoutConstraints(),
-		// because 'rowsFetched' should not consider the rows fetched before OFFSET position
+		// Note that 'rowsFetched' is not added in the nextWithoutConstraints(),
+		// because 'rowsFetched' should not count the rows fetched before reaching OFFSET position
         if(isNext) {
 			rowsFetched++;
 		}
