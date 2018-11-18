@@ -57,8 +57,8 @@ public class TsfileQueryResultSet implements ResultSet {
 	private boolean emptyResultSet = false;
 	private String operationType;
 	private final String TIMESTAMP_STR = "Time";
-    private final String LIMIT_STR = "LIMIT";
-    private final String OFFSET_STR = "OFFSET";
+    	private final String LIMIT_STR = "LIMIT";
+    	private final String OFFSET_STR = "OFFSET";
 	private int rowsLimit = 0; // 0 means it is not constrained
 	private int rowsOffset = 0; // 0 means it is not constrained, or the offset position has been reached
 
