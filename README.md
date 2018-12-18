@@ -27,7 +27,7 @@
     <dependency>
       <groupId>cn.edu.tsinghua</groupId>
       <artifactId>iotdb-jdbc</artifactId>
-      <version>0.7.1-SNAPSHOT</version>
+      <version>0.7.1</version>
     </dependency>
 </dependencies>
 ```
