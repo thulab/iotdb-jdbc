@@ -8,6 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
 
+import cn.edu.tsinghua.tsfile.timeseries.read.common.Path;
+import cn.edu.tsinghua.tsfile.timeseries.read.datatype.RowRecord;
+import cn.edu.tsinghua.tsfile.timeseries.read.datatype.TsPrimitiveType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,9 +21,6 @@ import cn.edu.tsinghua.iotdb.jdbc.thrift.TSRowRecord;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TS_Status;
 import cn.edu.tsinghua.iotdb.jdbc.thrift.TS_StatusCode;
 import cn.edu.tsinghua.tsfile.file.metadata.enums.TSDataType;
-import cn.edu.tsinghua.tsfile.timeseries.read.support.Path;
-import cn.edu.tsinghua.tsfile.timeseries.readV2.datatype.RowRecord;
-import cn.edu.tsinghua.tsfile.timeseries.readV2.datatype.TsPrimitiveType;
 
 public class UtilsTest {
 
